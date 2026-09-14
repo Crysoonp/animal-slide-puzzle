@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number Puzzle</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <h1>Number Puzzle Game</h1>
+
+    <div class="controls">
+        <button onclick="shuffle()">Shuffle</button>
+        <button onclick="setDifficulty(3)">3×3</button>
+        <button onclick="setDifficulty(4)">4×4</button>
+        <button onclick="setDifficulty(5)">5×5</button>
+        <button onclick="toggleOriginal()">完成図</button>
+    </div>
+
+    <div class="stats">
+        <p id="moves">Moves: 0</p>
+        <p id="timer">Time: 00:00</p>
+        <p id="best">Best: -</p>
+    </div>
+
+    <div id="game"></div>
+
+    <div id="original-container" style="display: none;">
+        <img id="original-image" src="images/cat.jpg" alt="完成図">
+    </div>
+
+    <div id="message"></div>
+
+    <script src="game.js"></script>
+
+</body>
+
+</html>
