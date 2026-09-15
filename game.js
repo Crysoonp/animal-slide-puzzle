@@ -89,17 +89,12 @@ function draw() {
 
         const emptyIndex = numbers.indexOf(null);
 
-        const validMoves = [
-            emptyIndex - 1,
-            emptyIndex + 1,
-            emptyIndex - boardSize,
-            emptyIndex + boardSize
-        ];
+        const validMoves =
+            getValidMoves(emptyIndex);
 
         if (validMoves.includes(index)) {
             tile.classList.add("movable");
         }
-        ``
 
         if (num === null) {
             tile.textContent = "";
@@ -139,16 +134,42 @@ function draw() {
     });
 }
 
+
+function getValidMoves(emptyIndex) {
+
+    const validMoves = [];
+
+    const row = Math.floor(emptyIndex / boardSize);
+    const col = emptyIndex % boardSize;
+
+    if (col > 0) {
+        validMoves.push(emptyIndex - 1);
+    }
+
+    if (col < boardSize - 1) {
+        validMoves.push(emptyIndex + 1);
+    }
+
+    if (row > 0) {
+        validMoves.push(emptyIndex - boardSize);
+    }
+
+    if (row < boardSize - 1) {
+        validMoves.push(emptyIndex + boardSize);
+    }
+
+    return validMoves;
+}
+
+
+
+
 function moveTile(index) {
 
     const emptyIndex = numbers.indexOf(null);
 
-    const validMoves = [
-        emptyIndex - 1,
-        emptyIndex + 1,
-        emptyIndex - boardSize,
-        emptyIndex + boardSize
-    ];
+    const validMoves =
+        getValidMoves(emptyIndex);
 
     if (validMoves.includes(index)) {
 
@@ -189,12 +210,8 @@ function shuffle() {
 
         const emptyIndex = numbers.indexOf(null);
 
-        const moves = [
-            emptyIndex - 1,
-            emptyIndex + 1,
-            emptyIndex - 3,
-            emptyIndex + 3
-        ].filter(index => index >= 0 && index < boardSize * boardSize);
+        const moves =
+            getValidMoves(emptyIndex);
 
         const randomIndex =
             moves[Math.floor(Math.random() * moves.length)];
@@ -236,7 +253,13 @@ function updateTimer() {
 
 function checkClear() {
 
-    const clearPattern = [1, 2, 3, 4, 5, 6, 7, 8, null];
+    const clearPattern = [];
+
+    for (let i = 1; i < boardSize * boardSize; i++) {
+        clearPattern.push(i);
+    }
+
+    clearPattern.push(null);
 
     let isClear = true;
 
@@ -278,23 +301,20 @@ function checkClear() {
             updateBestDisplay();
         }
 
-        bestText.textContent = "Best: " + bestScore + " moves";
+        alert(
+            "🎉 クリア！\n" +
+            "移動回数: " + moves + "\n" +
+            "時間: " +
+            Math.floor(seconds / 60)
+            + "分 "
+            + (seconds % 60)
+            + "秒"
+        );
+
     }
-
-
-    alert(
-        "🎉 クリア！\n" +
-        "移動回数: " + moves + "\n" +
-        "時間: " +
-        Math.floor(seconds / 60)
-        + "分 "
-        + (seconds % 60)
-        + "秒"
-    );
 
 }
 
-
-
 createBoard();
+updateBestDisplay();
 draw();
