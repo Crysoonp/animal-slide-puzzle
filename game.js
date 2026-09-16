@@ -274,10 +274,18 @@ function updateBestDisplay() {
 }
 
 
+
+
+
+let boardSize = 3;
+
+let selectedDifficulty = 3;
+
+let numbers = [];
+
 let seconds = 0;
 
 let timer = null;
-
 
 let currentImage = "cat.jpg";
 
@@ -289,18 +297,12 @@ const imageList = [
     "cloud.jpg"
 ];
 
-
-
-
 const BOARD_SIZE_PX = 480;
 
 
 
 
 
-let boardSize = 3;
-
-let numbers = [];
 
 function createBoard() {
 
@@ -319,6 +321,41 @@ let selected = null;
 let moves = 0;
 
 let isSolved = false;
+
+
+
+
+
+
+
+
+function updateDifficultyButtons() {
+
+    document
+        .querySelectorAll(
+            ".difficulty-buttons button"
+        )
+        .forEach(button => {
+
+            button.classList.remove(
+                "selected-difficulty"
+            );
+
+        });
+
+    document
+        .getElementById(
+            "diff-" + selectedDifficulty
+        )
+        .classList.add(
+            "selected-difficulty"
+        );
+}
+
+
+
+
+
 
 
 
@@ -508,15 +545,58 @@ function moveTile(index) {
 
 
 
+
+
 function setDifficulty(size) {
+
+    selectedDifficulty = size;
 
     boardSize = size;
 
-    shuffle();
+    clearInterval(timer);
+
+    seconds = 0;
+    moves = 0;
+
+    movesText.textContent =
+        "移動回数: 0";
+
+    timerText.textContent =
+        "経過時間: 00:00";
+
+    updateDifficultyButtons();
 
     updateBestDisplay();
-
 }
+
+
+
+
+
+
+function updateDifficultyButtons() {
+
+    document
+        .querySelectorAll(
+            ".difficulty-buttons button"
+        )
+        .forEach(button => {
+
+            button.classList.remove(
+                "selected-difficulty"
+            );
+
+        });
+
+    document
+        .getElementById(
+            "diff-" + selectedDifficulty
+        )
+        .classList.add(
+            "selected-difficulty"
+        );
+}
+
 
 
 

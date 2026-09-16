@@ -1,7 +1,16 @@
 body {
+
     text-align: center;
-    font-family: sans-serif;
+
+    font-family:
+        "Yu Gothic UI",
+        "Segoe UI",
+        sans-serif;
 }
+
+
+
+
 
 #game {
     width: fit-content;
@@ -11,9 +20,16 @@ body {
 }
 
 
+
+
+
 h1 {
 
-    margin-bottom: 15px;
+    font-size: 32px;
+
+    font-weight: 700;
+
+    letter-spacing: 2px;
 
 }
 
@@ -71,6 +87,20 @@ h1 {
 
 }
 
+
+
+
+.selected-difficulty {
+
+    background: #4caf50;
+
+    color: white;
+
+    font-weight: bold;
+
+    border: 2px solid #388e3c;
+
+}
 
 
 
@@ -188,7 +218,7 @@ h1 {
 .tile {
     width: 80px;
     height: 80px;
-    border: 0.5px solid rgba(255,255,255,0.3);
+    border: 0.5px solid rgba(255, 255, 255, 0.3);
     box-sizing: border-box;
     cursor: pointer;
 
