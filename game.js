@@ -19,6 +19,12 @@ const message = document.getElementById("message");
 const originalContainer =
     document.getElementById("original-container");
 
+const originalImage =
+    document.getElementById("original-image");
+
+
+
+
 function toggleOriginal() {
 
     if (originalContainer.style.display === "block") {
@@ -31,6 +37,25 @@ function toggleOriginal() {
 
     }
 }
+
+
+
+function randomImage() {
+
+    const randomIndex =
+        Math.floor(
+            Math.random() * imageList.length
+        );
+
+    currentImage =
+        imageList[randomIndex];
+
+    originalImage.src =
+        "images/" + currentImage;
+
+
+}
+
 
 
 
@@ -95,6 +120,23 @@ let seconds = 0;
 
 let timer = null;
 
+
+let currentImage = "cat.jpg";
+
+const imageList = [
+    "cat.jpg",
+    "dog.jpg",
+    "car.jpg",
+    "castle.jpg",
+    "cloud.jpg"
+];
+
+
+
+
+
+
+
 let boardSize = 3;
 
 let numbers = [];
@@ -146,13 +188,14 @@ function draw() {
                 const col = (num - 1) % boardSize;
 
                 tile.style.backgroundImage =
-                    "url('images/cat.jpg')";
+                    `url('images/${currentImage}')`;
 
-                tile.style.backgroundSize =
-                    `${boardSize * 80}px ${boardSize * 80}px`;
+tile.style.backgroundSize =
+    `${boardSize * 80}px ${boardSize * 80}px`;
 
-                tile.style.backgroundPosition =
-                    `-${col * 80}px -${row * 80}px`;
+tile.style.backgroundPosition =
+    `-${col * 80}px -${row * 80}px`;
+
 
             } else {
 
@@ -244,6 +287,8 @@ function setDifficulty(size) {
 
 function shuffle() {
 
+    randomImage();
+
     createBoard();
 
     for (let i = 0; i < 100; i++) {
@@ -275,6 +320,12 @@ function shuffle() {
     draw();
 
 }
+
+
+
+
+
+
 
 function updateTimer() {
 
@@ -351,14 +402,14 @@ function checkClear() {
         const currentBestTime =
             getBestTime();
 
-        
+
 
         if (
             currentBestTime === null ||
             seconds < Number(currentBestTime)
         ) {
 
-    
+
 
             localStorage.setItem(
                 "bestTime_" + boardSize,
