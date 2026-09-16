@@ -6,6 +6,9 @@ const timerText = document.getElementById("timer");
 
 const bestText = document.getElementById("best");
 
+const bestTimeText =
+    document.getElementById("best-time");
+
 const moveSound = new Audio("sounds/move.mp3");
 
 const clearSound = new Audio("sounds/clear.mp3");
@@ -37,16 +40,53 @@ function getBestScore() {
     );
 }
 
+
+function getBestTime() {
+
+    return localStorage.getItem(
+        "bestTime_" + boardSize
+    );
+
+}
+
+
 function updateBestDisplay() {
 
     const bestScore = getBestScore();
 
     if (bestScore !== null) {
+
         bestText.textContent =
             "Best: " + bestScore + " moves";
+
     } else {
-        bestText.textContent =
-            "Best: -";
+
+        bestText.textContent = "Best: -";
+
+    }
+
+    const bestTime =
+        getBestTime();
+
+    if (bestTime !== null) {
+
+        const minutes =
+            Math.floor(bestTime / 60);
+
+        const remainSeconds =
+            bestTime % 60;
+
+        bestTimeText.textContent =
+            "Best Time: "
+            + String(minutes).padStart(2, "0")
+            + ":"
+            + String(remainSeconds).padStart(2, "0");
+
+    } else {
+
+        bestTimeText.textContent =
+            "Best Time: -";
+
     }
 }
 
@@ -251,6 +291,9 @@ function updateTimer() {
 
 }
 
+
+
+
 function checkClear() {
 
     const clearPattern = [];
@@ -300,6 +343,37 @@ function checkClear() {
 
             updateBestDisplay();
         }
+
+
+
+
+
+        const currentBestTime =
+            getBestTime();
+
+        
+
+        if (
+            currentBestTime === null ||
+            seconds < Number(currentBestTime)
+        ) {
+
+    
+
+            localStorage.setItem(
+                "bestTime_" + boardSize,
+                seconds
+            );
+
+        }
+
+
+
+        updateBestDisplay();
+
+
+
+
 
         alert(
             "🎉 クリア！\n" +
