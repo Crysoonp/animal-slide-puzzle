@@ -10,30 +10,155 @@
 
 <body>
 
-    <h1>Number Puzzle Game</h1>
 
-    <div class="controls">
-        <button onclick="shuffle()">Shuffle</button>
-        <button onclick="setDifficulty(3)">3×3</button>
-        <button onclick="setDifficulty(4)">4×4</button>
-        <button onclick="setDifficulty(5)">5×5</button>
-        <button onclick="toggleOriginal()">完成図</button>
+
+
+
+    <h1>スライドパズルゲーム</h1>
+
+
+
+
+
+    <div class="top-bar">
+
+        <button class="settings-button" onclick="toggleSettings()">
+            ⚙️
+        </button>
+
     </div>
 
+    <div class="main-actions">
+
+        <button class="start-button" onclick="shuffle()">
+            🎮 ゲーム開始
+        </button>
+
+    </div>
+
+
+
+
+    <div class="difficulty-buttons">
+        <button onclick="setDifficulty(3)">
+            難易度: 😊 初級 (3x3)
+        </button>
+
+        <button onclick="setDifficulty(4)">
+            難易度: 😎 中級 (4x4)
+        </button>
+
+        <button onclick="setDifficulty(5)">
+            難易度: 🔥 上級 (5x5)
+        </button>
+        <button onclick="setDifficulty(6)">
+            難易度: 👹 超級 (6x6)
+        </button>
+
+    </div>
+
+
+    </div>
+
+
+
+
+
+
+
+    <div class="info-container">
+
+        <div class="info-panel">
+
+            <h3>現在のプレイ</h3>
+
+            <p id="moves">移動回数: 0</p>
+
+            <p id="timer">経過時間: 00:00</p>
+
+        </div>
+
+        <div class="record-panel">
+
+            <h3>ベスト記録</h3>
+
+            <p id="best">最少移動回数: -</p>
+
+            <p id="best-time">最短時間: -</p>
+
+        </div>
+
+    </div>
+
+
+
+
+
+    <div id="settings-menu" style="display:none;">
+
+        <button onclick="resetBestScore()">
+            最少移動回数をリセット
+        </button>
+
+        <button onclick="resetBestTime()">
+            最短時間をリセット
+        </button>
+
+        <button onclick="resetAllRecords()">
+            全記録をリセット
+        </button>
+
+    </div>
+
+    </div>
+
+
+
+
+
+
     <div class="stats">
-        <p id="moves">Moves: 0</p>
-        <p id="timer">Time: 00:00</p>
-        <p id="best">Best: -</p>
-        <p id="best-time">Best Time: -</p>
     </div>
 
     <div id="game"></div>
+
+
+    <div class="utility-buttons">
+        <button id="original-button" onclick="toggleOriginal()">
+            完成図
+        </button>
+    </div>
 
     <div id="original-container" style="display: none;">
         <img id="original-image" src="images/cat.jpg" alt="完成図">
     </div>
 
+
+
+
     <div id="message"></div>
+
+
+
+    <div id="clear-panel" style="display:none;">
+        <h2>🎉 CLEAR! 🎉</h2>
+
+        <p id="clear-moves"></p>
+
+        <p id="clear-time"></p>
+
+        <button onclick="closeClearPanel()">
+            OK
+        </button>
+
+        <button onclick="playAgain()">
+            🎮 もう一回遊ぶ
+        </button>
+
+
+    </div>
+
+
 
     <script src="game.js"></script>
 

@@ -16,8 +16,9 @@ const clearSound = new Audio("sounds/clear.mp3");
 const message = document.getElementById("message");
 
 
-const originalContainer =
-    document.getElementById("original-container");
+
+
+
 
 const originalImage =
     document.getElementById("original-image");
@@ -25,19 +26,176 @@ const originalImage =
 
 
 
-function toggleOriginal() {
+const clearPanel =
+    document.getElementById("clear-panel");
 
-    if (originalContainer.style.display === "block") {
+const clearMoves =
+    document.getElementById("clear-moves");
 
-        originalContainer.style.display = "none";
+const clearTime =
+    document.getElementById("clear-time");
+
+
+
+
+
+
+
+const settingsMenu =
+    document.getElementById(
+        "settings-menu"
+    );
+
+function toggleSettings() {
+
+    if (
+        settingsMenu.style.display ===
+        "block"
+    ) {
+
+        settingsMenu.style.display =
+            "none";
 
     } else {
 
-        originalContainer.style.display = "block";
-
+        settingsMenu.style.display =
+            "block";
     }
 }
 
+
+
+
+
+
+function resetBestScore() {
+
+    localStorage.removeItem(
+        "bestScore_" + boardSize
+    );
+
+    updateBestDisplay();
+
+}
+
+
+
+
+
+function resetBestTime() {
+
+    localStorage.removeItem(
+        "bestTime_" + boardSize
+    );
+
+    updateBestDisplay();
+
+}
+
+
+
+function resetAllRecords() {
+
+    localStorage.clear();
+
+    updateBestDisplay();
+
+}
+
+
+
+
+
+function resetAllRecords() {
+
+    if (
+        confirm(
+            "全記録をリセットしますか？"
+        )
+    ) {
+
+        localStorage.clear();
+
+        updateBestDisplay();
+    }
+}
+
+
+
+
+
+function closeClearPanel() {
+
+    clearPanel.style.display = "none";
+
+}
+
+function playAgain() {
+
+    closeClearPanel();
+
+    shuffle();
+
+}
+
+
+
+
+
+function debugClear() {
+
+    const clearPattern = [];
+
+    for (let i = 1; i < boardSize * boardSize; i++) {
+        clearPattern.push(i);
+    }
+
+    clearPattern.push(null);
+
+    numbers = clearPattern;
+
+    draw();
+
+    checkClear();
+}
+
+
+
+const originalContainer =
+    document.getElementById(
+        "original-container"
+    );
+
+const originalButton =
+    document.getElementById(
+        "original-button"
+    );
+
+
+
+function toggleOriginal() {
+
+    if (
+        originalContainer.style.display ===
+        "block"
+    ) {
+
+        originalContainer.style.display =
+            "none";
+
+        originalButton.textContent =
+            "完成図";
+
+    } else {
+
+        originalContainer.style.display =
+            "block";
+
+        originalButton.textContent =
+            "完成図を閉じる";
+
+    }
+}
 
 
 function randomImage() {
@@ -82,11 +240,11 @@ function updateBestDisplay() {
     if (bestScore !== null) {
 
         bestText.textContent =
-            "Best: " + bestScore + " moves";
+            "最少移動回数: " + bestScore;
 
     } else {
 
-        bestText.textContent = "Best: -";
+        bestText.textContent = "最少移動回数: -";
 
     }
 
@@ -102,7 +260,7 @@ function updateBestDisplay() {
             bestTime % 60;
 
         bestTimeText.textContent =
-            "Best Time: "
+            "最短時間: "
             + String(minutes).padStart(2, "0")
             + ":"
             + String(remainSeconds).padStart(2, "0");
@@ -110,7 +268,7 @@ function updateBestDisplay() {
     } else {
 
         bestTimeText.textContent =
-            "Best Time: -";
+            "最短時間: -";
 
     }
 }
@@ -132,6 +290,9 @@ const imageList = [
 ];
 
 
+
+
+const BOARD_SIZE_PX = 480;
 
 
 
@@ -157,10 +318,27 @@ let selected = null;
 
 let moves = 0;
 
+let isSolved = false;
+
+
+
+
 function draw() {
 
+    const tileSize =
+        BOARD_SIZE_PX / boardSize;
+
+
+
+
+
+
+        
+
     game.style.gridTemplateColumns =
-        `repeat(${boardSize}, 80px)`;
+        `repeat(${boardSize}, ${tileSize}px)`;
+
+
 
     game.innerHTML = "";
 
@@ -169,53 +347,103 @@ function draw() {
 
         tile.className = "tile";
 
+
+
+        tile.style.width =
+            `${tileSize}px`;
+
+        tile.style.height =
+            `${tileSize}px`;
+
+
+
+
         const emptyIndex = numbers.indexOf(null);
 
         const validMoves =
             getValidMoves(emptyIndex);
 
-        if (validMoves.includes(index)) {
-            tile.classList.add("movable");
-        }
+if (!isSolved &&
+    validMoves.includes(index)) {
 
-        if (num === null) {
-            tile.textContent = "";
-            tile.style.background = "#dddddd";
-        } else {
-            if (num !== null) {
-
-                const row = Math.floor((num - 1) / boardSize);
-                const col = (num - 1) % boardSize;
-
-                tile.style.backgroundImage =
-                    `url('images/${currentImage}')`;
-
-tile.style.backgroundSize =
-    `${boardSize * 80}px ${boardSize * 80}px`;
-
-tile.style.backgroundPosition =
-    `-${col * 80}px -${row * 80}px`;
+    tile.classList.add("movable");
+}
 
 
-            } else {
 
-                tile.style.background = "#dddddd";
-            }
-        }
+
+if (num === null) {
+
+    if (isSolved) {
+
+        const row = boardSize - 1;
+        const col = boardSize - 1;
+
+        tile.style.backgroundImage =
+            `url('images/${currentImage}')`;
+
+        tile.style.backgroundSize =
+            `${BOARD_SIZE_PX}px ${BOARD_SIZE_PX}px`;
+
+        tile.style.backgroundPosition =
+            `-${col * tileSize}px -${row * tileSize}px`;
+
+        tile.classList.add("fade-in");
+
+    } else {
+
+        tile.textContent = "";
+        tile.style.background = "#dddddd";
+
+    }
+
+} else {
+
+    const row =
+        Math.floor((num - 1) / boardSize);
+
+    const col =
+        (num - 1) % boardSize;
+
+    tile.style.backgroundImage =
+        `url('images/${currentImage}')`;
+
+    tile.style.backgroundSize =
+        `${BOARD_SIZE_PX}px ${BOARD_SIZE_PX}px`;
+
+    tile.style.backgroundPosition =
+        `-${col * tileSize}px -${row * tileSize}px`;
+}        
+
+
+
+        
 
         if (selected === index) {
             tile.style.background = "orange";
         }
 
-        tile.addEventListener("click", () => {
+if (!isSolved) {
 
-            moveTile(index);
+    tile.addEventListener("click", () => {
 
-        });
+        moveTile(index);
 
+    });
+
+}
         game.appendChild(tile);
     });
 }
+
+
+
+
+
+
+
+
+
 
 
 function getValidMoves(emptyIndex) {
@@ -249,6 +477,10 @@ function getValidMoves(emptyIndex) {
 
 function moveTile(index) {
 
+    if (isSolved) {
+        return;
+    }
+
     const emptyIndex = numbers.indexOf(null);
 
     const validMoves =
@@ -264,7 +496,7 @@ function moveTile(index) {
         moveSound.currentTime = 0;
         moveSound.play();
 
-        movesText.textContent = "Moves: " + moves;
+        movesText.textContent = "移動回数: " + moves;
 
 
 
@@ -274,18 +506,26 @@ function moveTile(index) {
 }
 
 
+
+
 function setDifficulty(size) {
 
     boardSize = size;
 
-    createBoard();
+    shuffle();
 
     updateBestDisplay();
 
-    draw();
 }
 
+
+
+
+
+
 function shuffle() {
+
+isSolved = false;
 
     randomImage();
 
@@ -309,8 +549,8 @@ function shuffle() {
     moves = 0;
     seconds = 0;
 
-    movesText.textContent = "Moves: 0";
-    timerText.textContent = "Time: 00:00";
+    movesText.textContent = "移動回数: 0";
+    timerText.textContent = "経過時間: 00:00";
 
     message.textContent = "";
 
@@ -335,7 +575,7 @@ function updateTimer() {
     const remainSeconds = seconds % 60;
 
     timerText.textContent =
-        "Time: " +
+        "経過時間: " +
         String(minutes).padStart(2, "0") +
         ":" +
         String(remainSeconds).padStart(2, "0");
@@ -367,17 +607,16 @@ function checkClear() {
 
     if (isClear) {
 
+
+        isSolved = true;
+
+draw();
+
         clearInterval(timer);
 
         clearSound.play();
 
-        message.textContent = "🎉 CLEAR! 🎉";
 
-        message.classList.remove("clear-animation");
-
-        void message.offsetWidth;
-
-        message.classList.add("clear-animation");
 
         const currentBest =
             getBestScore();
@@ -426,19 +665,56 @@ function checkClear() {
 
 
 
-        alert(
-            "🎉 クリア！\n" +
-            "移動回数: " + moves + "\n" +
-            "時間: " +
-            Math.floor(seconds / 60)
+
+
+
+
+
+
+
+
+        clearMoves.textContent =
+            "移動回数: " + moves;
+
+        clearTime.textContent =
+            "時間: "
+            + Math.floor(seconds / 60)
             + "分 "
             + (seconds % 60)
-            + "秒"
-        );
+            + "秒";
+
+        clearPanel.style.display = "block";
+
+
+
+
+
 
     }
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 createBoard();
 updateBestDisplay();
