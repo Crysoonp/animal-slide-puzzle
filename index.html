@@ -1,12 +1,36 @@
 <!DOCTYPE html>
 <html lang="ja">
 
+
+
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Number Puzzle</title>
+
     <link rel="stylesheet" href="style.css">
+
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;900&display=swap"
+        rel="stylesheet">
+
 </head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 <body>
 
@@ -14,57 +38,32 @@
 
 
 
-    <h1>スライドパズルゲーム</h1>
 
 
 
 
 
-    <div class="top-bar">
 
-        <button class="settings-button" onclick="toggleSettings()">
-            ⚙️
+
+
+
+
+
+
+
+    <div id="title-screen">
+
+        <img src="images/title.jpg" alt="タイトル画像" id="title-image">
+
+        <button class="start-button title-start-button" onclick="startTitleGame()">
+
+            🎮 START!
+
         </button>
 
     </div>
 
-    <div class="main-actions">
-
-        <button class="start-button" onclick="shuffle()">
-            🎮 ゲーム開始
-        </button>
-
-    </div>
-
-
-
-
-   <div class="difficulty-buttons">
-
-    <button id="diff-3"
-            onclick="setDifficulty(3)">
-        😊 初級
-    </button>
-
-    <button id="diff-4"
-            onclick="setDifficulty(4)">
-        😎 中級
-    </button>
-
-    <button id="diff-5"
-            onclick="setDifficulty(5)">
-        🔥 上級
-    </button>
-
-    <button id="diff-6"
-            onclick="setDifficulty(6)">
-        👹 超級
-    </button>
-
-</div>
-
-
-    </div>
+    <div id="game-screen">
 
 
 
@@ -72,101 +71,170 @@
 
 
 
-    <div class="info-container">
 
-        <div class="info-panel">
+        <div class="main-actions">
 
-            <h3>現在のプレイ</h3>
+            <button id="cancel-button" class="cancel-button" onclick="cancelGame()" style="display:none;">
+                ⏹ 中止
+            </button>
 
-            <p id="moves">移動回数: 0</p>
+            <button class="start-button" onclick="shuffle()">
+                🎮 ゲーム開始
+            </button>
 
-            <p id="timer">経過時間: 00:00</p>
+            <button class="settings-button" onclick="toggleSettings()">
+                ⚙️
+            </button>
 
         </div>
 
-        <div class="record-panel">
 
-            <h3>ベスト記録</h3>
 
-            <p id="best">最少移動回数: -</p>
 
-            <p id="best-time">最短時間: -</p>
+
+
+
+
+        <div id="difficulty-container" class="difficulty-buttons">
+
+            <button id="diff-3" onclick="setDifficulty(3)">
+                😊 初級
+            </button>
+
+            <button id="diff-4" onclick="setDifficulty(4)">
+                😎 中級
+            </button>
+
+            <button id="diff-5" onclick="setDifficulty(5)">
+                🔥 上級
+            </button>
+
+            <button id="diff-6" onclick="setDifficulty(6)">
+                👹 超級
+            </button>
 
         </div>
 
+
+
+
+
+
+
+
+
+
+
+        <div class="info-container">
+
+            <div class="info-panel">
+
+                <h3>🎮 現在のプレイ</h3>
+
+                <p id="moves">🎯 移動回数: 0</p>
+
+                <p id="timer">⏰ 経過時間: 00:00</p>
+
+            </div>
+
+            <div class="record-panel">
+
+                <h3>🏆ベスト記録</h3>
+                <p id="best">
+                    🥇 最少移動回数: -
+                </p>
+
+                <p id="best-time">
+                    ⭐ 最短時間: -
+                </p>
+
+            </div>
+
+        </div>
+
+
+
+
+
+        <div id="settings-menu" style="display:none;">
+
+            <button onclick="resetBestScore()">
+                最少移動回数をリセット
+            </button>
+
+            <button onclick="resetBestTime()">
+                最短時間をリセット
+            </button>
+
+            <button onclick="resetAllRecords()">
+                全記録をリセット
+            </button>
+
+        </div>
+
+
+
+
+
+
+
+
+        <div class="stats">
+        </div>
+
+        <div id="game"></div>
+
+
+        <div class="utility-buttons">
+            <button id="original-button" onclick="toggleOriginal()">
+                🖼️ 完成図
+            </button>
+        </div>
+
+        <div id="original-container" style="display: none;">
+            <img id="original-image" src="images/cat.jpg" alt="🖼️ 完成図">
+        </div>
+
+
+
+
+        <div id="message"></div>
+
+
+
+
+
+        <div id="clear-panel" style="display:none;">
+
+            <div id="clear-stats">
+
+                <span id="clear-moves"></span>
+
+                <span id="clear-time"></span>
+
+            </div>
+
+            <h2 id="clear-title">🎉 CLEAR! 🎉</h2>
+
+            <div id="clear-buttons">
+
+                <button onclick="closeClearPanel()">
+                    OK
+                </button>
+
+                <button onclick="playAgain()">
+                    🎮 もう一回遊ぶ
+                </button>
+
+            </div>
+
+        </div>
+
+
     </div>
-
-
-
-
-
-    <div id="settings-menu" style="display:none;">
-
-        <button onclick="resetBestScore()">
-            最少移動回数をリセット
-        </button>
-
-        <button onclick="resetBestTime()">
-            最短時間をリセット
-        </button>
-
-        <button onclick="resetAllRecords()">
-            全記録をリセット
-        </button>
-
-    </div>
-
-    </div>
-
-
-
-
-
-
-    <div class="stats">
-    </div>
-
-    <div id="game"></div>
-
-
-    <div class="utility-buttons">
-        <button id="original-button" onclick="toggleOriginal()">
-            完成図
-        </button>
-    </div>
-
-    <div id="original-container" style="display: none;">
-        <img id="original-image" src="images/cat.jpg" alt="完成図">
-    </div>
-
-
-
-
-    <div id="message"></div>
-
-
-
-    <div id="clear-panel" style="display:none;">
-        <h2>🎉 CLEAR! 🎉</h2>
-
-        <p id="clear-moves"></p>
-
-        <p id="clear-time"></p>
-
-        <button onclick="closeClearPanel()">
-            OK
-        </button>
-
-        <button onclick="playAgain()">
-            🎮 もう一回遊ぶ
-        </button>
-
-
-    </div>
-
-
 
     <script src="game.js"></script>
+
 
 </body>
 

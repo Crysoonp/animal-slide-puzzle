@@ -128,7 +128,14 @@ function closeClearPanel() {
 
     clearPanel.style.display = "none";
 
+    setDifficultyButtonsDisabled(false);
+
 }
+
+
+
+
+
 
 function playAgain() {
 
@@ -184,7 +191,7 @@ function toggleOriginal() {
             "none";
 
         originalButton.textContent =
-            "完成図";
+            "🖼️ 完成図";
 
     } else {
 
@@ -192,7 +199,7 @@ function toggleOriginal() {
             "block";
 
         originalButton.textContent =
-            "完成図を閉じる";
+            "🖼️ 完成図を閉じる";
 
     }
 }
@@ -233,6 +240,10 @@ function getBestTime() {
 }
 
 
+
+
+
+
 function updateBestDisplay() {
 
     const bestScore = getBestScore();
@@ -240,11 +251,11 @@ function updateBestDisplay() {
     if (bestScore !== null) {
 
         bestText.textContent =
-            "最少移動回数: " + bestScore;
+            "🥇 最少移動回数: " + bestScore;
 
     } else {
 
-        bestText.textContent = "最少移動回数: -";
+        bestText.textContent = "🥇 最少移動回数: -";
 
     }
 
@@ -260,7 +271,7 @@ function updateBestDisplay() {
             bestTime % 60;
 
         bestTimeText.textContent =
-            "最短時間: "
+            "⭐ 最短時間: "
             + String(minutes).padStart(2, "0")
             + ":"
             + String(remainSeconds).padStart(2, "0");
@@ -268,7 +279,7 @@ function updateBestDisplay() {
     } else {
 
         bestTimeText.textContent =
-            "最短時間: -";
+            "⭐ 最短時間: -";
 
     }
 }
@@ -277,9 +288,30 @@ function updateBestDisplay() {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 let boardSize = 3;
 
 let selectedDifficulty = 3;
+
+let gameStarted = false;
 
 let numbers = [];
 
@@ -366,15 +398,8 @@ function draw() {
         BOARD_SIZE_PX / boardSize;
 
 
-
-
-
-
-        
-
     game.style.gridTemplateColumns =
         `repeat(${boardSize}, ${tileSize}px)`;
-
 
 
     game.innerHTML = "";
@@ -400,75 +425,84 @@ function draw() {
         const validMoves =
             getValidMoves(emptyIndex);
 
-if (!isSolved &&
-    validMoves.includes(index)) {
+        if (
+            gameStarted &&
+            !isSolved &&
+            validMoves.includes(index)
+        ) {
 
-    tile.classList.add("movable");
-}
-
-
-
-
-if (num === null) {
-
-    if (isSolved) {
-
-        const row = boardSize - 1;
-        const col = boardSize - 1;
-
-        tile.style.backgroundImage =
-            `url('images/${currentImage}')`;
-
-        tile.style.backgroundSize =
-            `${BOARD_SIZE_PX}px ${BOARD_SIZE_PX}px`;
-
-        tile.style.backgroundPosition =
-            `-${col * tileSize}px -${row * tileSize}px`;
-
-        tile.classList.add("fade-in");
-
-    } else {
-
-        tile.textContent = "";
-        tile.style.background = "#dddddd";
-
-    }
-
-} else {
-
-    const row =
-        Math.floor((num - 1) / boardSize);
-
-    const col =
-        (num - 1) % boardSize;
-
-    tile.style.backgroundImage =
-        `url('images/${currentImage}')`;
-
-    tile.style.backgroundSize =
-        `${BOARD_SIZE_PX}px ${BOARD_SIZE_PX}px`;
-
-    tile.style.backgroundPosition =
-        `-${col * tileSize}px -${row * tileSize}px`;
-}        
+            tile.classList.add("movable");
+        }
 
 
 
-        
+
+        if (num === null) {
+
+            if (isSolved) {
+
+                const row = boardSize - 1;
+                const col = boardSize - 1;
+
+                tile.style.backgroundImage =
+                    `url('images/${currentImage}')`;
+
+                tile.style.backgroundSize =
+                    `${BOARD_SIZE_PX}px ${BOARD_SIZE_PX}px`;
+
+                tile.style.backgroundPosition =
+                    `-${col * tileSize}px -${row * tileSize}px`;
+
+                tile.classList.add("fade-in");
+
+            } else {
+
+                tile.style.backgroundImage = "none";
+                tile.style.background = "#d9d9d9";
+
+            }
+
+        } else {
+
+            const row =
+                Math.floor((num - 1) / boardSize);
+
+            const col =
+                (num - 1) % boardSize;
+
+            if (gameStarted) {
+
+                tile.style.backgroundImage =
+                    `url('images/${currentImage}')`;
+
+                tile.style.backgroundSize =
+                    `${BOARD_SIZE_PX}px ${BOARD_SIZE_PX}px`;
+
+                tile.style.backgroundPosition =
+                    `-${col * tileSize}px -${row * tileSize}px`;
+
+            } else {
+
+                tile.style.backgroundImage = "none";
+                tile.style.background = "#d9d9d9";
+
+            }
+
+        }
 
         if (selected === index) {
             tile.style.background = "orange";
         }
 
-if (!isSolved) {
+        if (!isSolved) {
 
-    tile.addEventListener("click", () => {
+            tile.addEventListener("click", () => {
 
-        moveTile(index);
+                moveTile(index);
 
-    });
+            });
 
-}
+        }
         game.appendChild(tile);
     });
 }
@@ -514,7 +548,7 @@ function getValidMoves(emptyIndex) {
 
 function moveTile(index) {
 
-    if (isSolved) {
+    if (!gameStarted || isSolved) {
         return;
     }
 
@@ -533,7 +567,7 @@ function moveTile(index) {
         moveSound.currentTime = 0;
         moveSound.play();
 
-        movesText.textContent = "移動回数: " + moves;
+        movesText.textContent = "🎯 移動回数: " + moves;
 
 
 
@@ -549,9 +583,19 @@ function moveTile(index) {
 
 function setDifficulty(size) {
 
+    gameStarted = false;
+
     selectedDifficulty = size;
 
     boardSize = size;
+
+    numbers = [];
+
+    for (let i = 1; i < boardSize * boardSize; i++) {
+        numbers.push(i);
+    }
+
+    numbers.push(null);
 
     clearInterval(timer);
 
@@ -559,16 +603,85 @@ function setDifficulty(size) {
     moves = 0;
 
     movesText.textContent =
-        "移動回数: 0";
+        "🎯 移動回数: 0";
 
     timerText.textContent =
-        "経過時間: 00:00";
+        "⏰ 経過時間: 00:00";
 
     updateDifficultyButtons();
 
     updateBestDisplay();
+
+    draw();
+
 }
 
+
+
+
+
+
+
+
+
+
+function cancelGame() {
+
+    gameStarted = false;
+
+    clearInterval(timer);
+
+    moves = 0;
+    seconds = 0;
+
+    movesText.textContent =
+        "🎯 移動回数: 0";
+
+    timerText.textContent =
+        "⏰ 経過時間: 00:00";
+
+    setDifficultyButtonsDisabled(false);
+
+    document.getElementById(
+        "cancel-button"
+    ).style.display = "none";
+
+
+    document.getElementById(
+        "original-button"
+    ).style.display = "none";
+
+    document.getElementById(
+        "original-container"
+    ).style.display = "none";
+
+
+
+    draw();
+
+}
+
+
+
+
+
+
+
+
+
+function setDifficultyButtonsDisabled(disabled) {
+
+    document
+        .querySelectorAll(
+            "#difficulty-container button"
+        )
+        .forEach(button => {
+
+            button.disabled = disabled;
+
+        });
+
+}
 
 
 
@@ -605,7 +718,11 @@ function updateDifficultyButtons() {
 
 function shuffle() {
 
-isSolved = false;
+    gameStarted = true;
+
+    setDifficultyButtonsDisabled(true);
+
+    isSolved = false;
 
     randomImage();
 
@@ -629,13 +746,25 @@ isSolved = false;
     moves = 0;
     seconds = 0;
 
-    movesText.textContent = "移動回数: 0";
-    timerText.textContent = "経過時間: 00:00";
+    movesText.textContent = "🎯 移動回数: 0";
+    timerText.textContent = "⏰ 経過時間: 00:00";
 
     message.textContent = "";
 
     clearInterval(timer);
     timer = setInterval(updateTimer, 1000);
+
+
+    document.getElementById(
+        "cancel-button"
+    ).style.display = "inline-block";
+
+
+    document.getElementById(
+        "original-button"
+    ).style.display = "inline-block";
+
+
 
     draw();
 
@@ -655,7 +784,7 @@ function updateTimer() {
     const remainSeconds = seconds % 60;
 
     timerText.textContent =
-        "経過時間: " +
+        "⏰ 経過時間: " +
         String(minutes).padStart(2, "0") +
         ":" +
         String(remainSeconds).padStart(2, "0");
@@ -690,7 +819,7 @@ function checkClear() {
 
         isSolved = true;
 
-draw();
+        draw();
 
         clearInterval(timer);
 
@@ -745,7 +874,9 @@ draw();
 
 
 
-
+        document.getElementById(
+            "cancel-button"
+        ).style.display = "none";
 
 
 
@@ -754,10 +885,10 @@ draw();
 
 
         clearMoves.textContent =
-            "移動回数: " + moves;
+            "🎯 移動回数: " + moves;
 
         clearTime.textContent =
-            "時間: "
+            "⏰ 経過時間: "
             + Math.floor(seconds / 60)
             + "分 "
             + (seconds % 60)
@@ -781,7 +912,17 @@ draw();
 
 
 
+function startTitleGame() {
 
+    document.getElementById(
+        "title-screen"
+    ).style.display = "none";
+
+    document.getElementById(
+        "game-screen"
+    ).style.display = "block";
+
+}
 
 
 
