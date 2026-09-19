@@ -67,22 +67,63 @@ const settingsMenu =
 
 
 
-
 function toggleSettings() {
 
     if (
         settingsMenu.style.display ===
-        "block"
+        "flex"
     ) {
 
-        settingsMenu.style.display =
-            "none";
+        closeSettings();
 
     } else {
 
         settingsMenu.style.display =
-            "block";
+            "flex";
+
+        document.body.style.overflow =
+            "hidden";
+
     }
+
+}
+
+
+
+
+
+function closeSettings() {
+
+    buttonSound.currentTime = 0;
+    buttonSound.play();
+
+    settingsMenu.style.display =
+        "none";
+
+    document.body.style.overflow =
+        "";
+
+}
+
+
+
+
+function getDifficultyName() {
+
+    const difficultyNames = {
+
+        3: "初級",
+
+        4: "中級",
+
+        5: "上級",
+
+        6: "超級"
+
+    };
+
+    return difficultyNames[boardSize];
+
 }
 
 
@@ -92,38 +133,52 @@ function toggleSettings() {
 
 function resetBestScore() {
 
-    localStorage.removeItem(
-        "bestScore_" + boardSize
-    );
+    const difficultyName =
+        getDifficultyName();
 
-    updateBestDisplay();
+    if (
+        confirm(
+            difficultyName
+            + "の最少移動回数を"
+            + "リセットしますか？"
+        )
+    ) {
+
+        localStorage.removeItem(
+            "bestScore_" + boardSize
+        );
+
+        updateBestDisplay();
+
+    }
 
 }
-
 
 
 
 
 function resetBestTime() {
 
-    localStorage.removeItem(
-        "bestTime_" + boardSize
-    );
+    const difficultyName =
+        getDifficultyName();
 
-    updateBestDisplay();
+    if (
+        confirm(
+            difficultyName
+            + "の最短時間を"
+            + "リセットしますか？"
+        )
+    ) {
+
+        localStorage.removeItem(
+            "bestTime_" + boardSize
+        );
+
+        updateBestDisplay();
+
+    }
 
 }
-
-
-
-function resetAllRecords() {
-
-    localStorage.clear();
-
-    updateBestDisplay();
-
-}
-
 
 
 
@@ -132,14 +187,18 @@ function resetAllRecords() {
 
     if (
         confirm(
-            "全記録をリセットしますか？"
+            "すべての難易度の"
+            + "最少移動回数と最短時間を"
+            + "リセットしますか？"
         )
     ) {
 
         localStorage.clear();
 
         updateBestDisplay();
+
     }
+
 }
 
 
@@ -152,7 +211,7 @@ function closeClearPanel() {
 
     clearPanel.style.display = "none";
 
-    document.body.style.overflow = "auto";
+    document.body.style.overflow = "";
 
     setDifficultyButtonsDisabled(false);
 
@@ -161,14 +220,12 @@ function closeClearPanel() {
 
 
 
+
 function playAgain() {
 
-    buttonSound.currentTime = 0;
-    buttonSound.play();
+    clearPanel.style.display = "none";
 
-    document.body.style.overflow = "auto";
-
-    closeClearPanel();
+    document.body.style.overflow = "";
 
     shuffle();
 
@@ -209,29 +266,38 @@ const originalButton =
 
 
 
+
+
 function toggleOriginal() {
 
-    if (
-        originalContainer.style.display ===
-        "block"
-    ) {
+    buttonSound.currentTime = 0;
+    buttonSound.play();
 
-        originalContainer.style.display =
-            "none";
+    originalContainer.style.display =
+        "flex";
 
-        originalButton.textContent =
-            "🖼️ 完成図";
+    document.body.style.overflow =
+        "hidden";
 
-    } else {
-
-        originalContainer.style.display =
-            "block";
-
-        originalButton.textContent =
-            "🖼️ 完成図を閉じる";
-
-    }
 }
+
+
+
+
+
+function closeOriginal() {
+
+    buttonSound.currentTime = 0;
+    buttonSound.play();
+
+    originalContainer.style.display =
+        "none";
+
+    document.body.style.overflow =
+        "";
+
+}
+
 
 
 function randomImage() {
@@ -600,6 +666,8 @@ function setDifficulty(size) {
         "clear-panel"
     ).style.display = "none";
 
+    document.body.style.overflow = "";
+
     gameStarted = false;
 
     isSolved = false;
@@ -684,6 +752,8 @@ function cancelGame() {
     document.getElementById(
         "original-container"
     ).style.display = "none";
+
+    document.body.style.overflow = "";
 
 
 
@@ -940,14 +1010,11 @@ function checkClear() {
             + (seconds % 60)
             + "秒";
 
-        clearPanel.style.display = "block";
-
         setDifficultyButtonsDisabled(false);
 
-clearPanel.style.display = "block";
+        clearPanel.style.display = "block";
 
-document.body.style.overflow = "hidden";
-
+        document.body.style.overflow = "hidden";
 
 
 
