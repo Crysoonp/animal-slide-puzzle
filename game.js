@@ -9,13 +9,26 @@ const bestText = document.getElementById("best");
 const bestTimeText =
     document.getElementById("best-time");
 
+
+
+
+
+
 const moveSound = new Audio("sounds/move.mp3");
 
-const clearSound = new Audio("sounds/clear.mp3");
+const clearSound = new Audio("sounds/clear_fanfare.mp3");
+
+const selectSound =
+    new Audio("sounds/select_difficulty.mp3");
+
+
+
+
 
 const message = document.getElementById("message");
 
-
+const buttonSound =
+    new Audio("sounds/selection_sound.mp3");
 
 
 
@@ -39,12 +52,14 @@ const clearTime =
 
 
 
-
-
 const settingsMenu =
     document.getElementById(
         "settings-menu"
     );
+
+
+
+
 
 function toggleSettings() {
 
@@ -126,6 +141,9 @@ function resetAllRecords() {
 
 function closeClearPanel() {
 
+    buttonSound.currentTime = 0;
+    buttonSound.play();
+
     clearPanel.style.display = "none";
 
     setDifficultyButtonsDisabled(false);
@@ -138,6 +156,9 @@ function closeClearPanel() {
 
 
 function playAgain() {
+
+    buttonSound.currentTime = 0;
+    buttonSound.play();
 
     closeClearPanel();
 
@@ -361,30 +382,6 @@ let isSolved = false;
 
 
 
-function updateDifficultyButtons() {
-
-    document
-        .querySelectorAll(
-            ".difficulty-buttons button"
-        )
-        .forEach(button => {
-
-            button.classList.remove(
-                "selected-difficulty"
-            );
-
-        });
-
-    document
-        .getElementById(
-            "diff-" + selectedDifficulty
-        )
-        .classList.add(
-            "selected-difficulty"
-        );
-}
-
-
 
 
 
@@ -583,7 +580,16 @@ function moveTile(index) {
 
 function setDifficulty(size) {
 
+    selectSound.currentTime = 0;
+    selectSound.play();
+
+    document.getElementById(
+        "clear-panel"
+    ).style.display = "none";
+
     gameStarted = false;
+
+    isSolved = false;
 
     selectedDifficulty = size;
 
@@ -614,6 +620,10 @@ function setDifficulty(size) {
 
     draw();
 
+    document.getElementById(
+        "start-button"
+    ).disabled = false;
+
 }
 
 
@@ -628,6 +638,13 @@ function setDifficulty(size) {
 function cancelGame() {
 
     gameStarted = false;
+
+
+
+    document.getElementById(
+        "start-button"
+    ).disabled = false;
+
 
     clearInterval(timer);
 
@@ -716,9 +733,25 @@ function updateDifficultyButtons() {
 
 
 
+
+
+
+
+
 function shuffle() {
 
+    buttonSound.currentTime = 0;
+    buttonSound.play();
+
     gameStarted = true;
+
+
+
+    document.getElementById(
+        "start-button"
+    ).disabled = true;
+
+
 
     setDifficultyButtonsDisabled(true);
 
@@ -901,6 +934,18 @@ function checkClear() {
 
 
 
+        setDifficultyButtonsDisabled(false);
+
+        clearPanel.style.display = "block";
+
+
+
+
+
+
+
+
+
     }
 
 }
@@ -912,7 +957,29 @@ function checkClear() {
 
 
 
+
+function selectDifficulty(level) {
+
+    difficulty = level;
+
+    document.getElementById(
+        "start-button"
+    ).disabled = false;
+
+}
+
+
+
+
+
+
+
+
+
 function startTitleGame() {
+
+    buttonSound.currentTime = 0;
+    buttonSound.play();
 
     document.getElementById(
         "title-screen"

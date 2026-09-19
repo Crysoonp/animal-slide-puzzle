@@ -66,6 +66,27 @@ h1 {
 
 
 
+
+
+
+
+
+
+
+.start-button:disabled {
+
+    opacity: 0.5;
+
+    filter: grayscale(100%);
+
+    cursor: not-allowed;
+
+}
+
+
+
+
+
 button {
 
     border: none;
@@ -715,7 +736,23 @@ h1 {
 
 
 
+#clear-moves,
+#clear-time {
 
+    color: white;
+
+    font-size: 28px;
+
+    font-weight: 900;
+
+    text-shadow:
+        -2px -2px 0 black,
+         2px -2px 0 black,
+        -2px  2px 0 black,
+         2px  2px 0 black,
+         0 0 10px rgba(255,255,255,0.5);
+
+}
 
 
 

@@ -51,6 +51,17 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
     <div id="title-screen">
 
         <img src="images/title.jpg" alt="タイトル画像" id="title-image">
@@ -71,15 +82,19 @@
 
 
 
+        
 
-        <div class="main-actions">
+
+ <div class="main-actions">
 
             <button id="cancel-button" class="cancel-button" onclick="cancelGame()" style="display:none;">
                 ⏹ 中止
             </button>
 
-            <button class="start-button" onclick="shuffle()">
+            <button id="start-button" class="start-button" onclick="shuffle()" disabled>
+
                 🎮 ゲーム開始
+
             </button>
 
             <button class="settings-button" onclick="toggleSettings()">
@@ -88,6 +103,9 @@
 
         </div>
 
+
+
+       
 
 
 
