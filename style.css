@@ -561,20 +561,6 @@ h1 {
 
 
 
-#clear-panel {
-
-    position: fixed;
-
-    top: 50%;
-
-    left: 50%;
-
-    transform:
-        translate(-50%, -50%)
-        translateY(80px);
-
-}
-
 
 
 
@@ -655,9 +641,6 @@ h1 {
 
 
 
-
-
-
 #clear-panel {
 
     display: none;
@@ -674,12 +657,9 @@ h1 {
 
     border-radius: 20px;
 
-
     z-index: 9999;
 
 }
-
-
 
 
 
@@ -784,3 +764,136 @@ h1 {
     display: none;
 
 }
+
+
+
+
+@media (max-width: 768px) {
+
+
+.cancel-button {
+
+    position: static;
+
+}
+
+.settings-button {
+
+    position: static;
+
+}
+
+.main-actions {
+
+    gap: 10px;
+
+}
+
+
+
+    .info-container {
+
+        display: flex;
+
+        flex-direction: row;
+
+        justify-content: center;
+
+        gap: 10px;
+
+        flex-wrap: nowrap;
+
+    }
+
+    .info-panel,
+    .record-panel {
+
+        min-width: 140px;
+
+        padding: 5px;
+
+        font-size: 14px;
+
+    }
+
+}
+
+
+
+
+
+
+@media (max-width: 768px) {
+
+    #clear-title {
+
+        font-size: 48px;
+
+        margin: 30px 0;
+
+    }
+
+    #clear-stats {
+
+        margin-top: 20px;
+
+        margin-bottom: 20px;
+
+        flex-direction: column;
+
+        gap: 10px;
+
+    }
+
+    #clear-buttons {
+
+        margin-top: 20px;
+
+        flex-direction: column;
+
+    }
+
+}
+
+
+
+
+
+
+
+
+
+@media (max-width: 768px) {
+
+    #clear-moves,
+    #clear-time {
+
+        font-size: 18px;
+
+    }
+
+}
+
+
+
+
+
+
+
+@media (max-width: 768px) {
+
+    #clear-stats {
+
+        margin-top: 80px;
+
+        margin-bottom: 20px;
+
+        gap: 5px;
+
+    }
+
+}
+
+
+
+

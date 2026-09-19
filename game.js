@@ -21,6 +21,13 @@ const clearSound = new Audio("sounds/clear_fanfare.mp3");
 const selectSound =
     new Audio("sounds/select_difficulty.mp3");
 
+const titleBgm =
+    new Audio("BGM/title.mp3");
+
+titleBgm.loop = true;
+
+
+
 
 
 
@@ -138,13 +145,14 @@ function resetAllRecords() {
 
 
 
-
 function closeClearPanel() {
 
     buttonSound.currentTime = 0;
     buttonSound.play();
 
     clearPanel.style.display = "none";
+
+    document.body.style.overflow = "auto";
 
     setDifficultyButtonsDisabled(false);
 
@@ -153,12 +161,12 @@ function closeClearPanel() {
 
 
 
-
-
 function playAgain() {
 
     buttonSound.currentTime = 0;
     buttonSound.play();
+
+    document.body.style.overflow = "auto";
 
     closeClearPanel();
 
@@ -350,9 +358,14 @@ const imageList = [
     "cloud.jpg"
 ];
 
-const BOARD_SIZE_PX = 480;
 
 
+
+const BOARD_SIZE_PX =
+    Math.min(
+        window.innerWidth * 0.90,
+        480
+    );
 
 
 
@@ -929,14 +942,11 @@ function checkClear() {
 
         clearPanel.style.display = "block";
 
-
-
-
-
-
         setDifficultyButtonsDisabled(false);
 
-        clearPanel.style.display = "block";
+clearPanel.style.display = "block";
+
+document.body.style.overflow = "hidden";
 
 
 
@@ -975,11 +985,13 @@ function selectDifficulty(level) {
 
 
 
-
 function startTitleGame() {
 
     buttonSound.currentTime = 0;
     buttonSound.play();
+
+    titleBgm.pause();
+    titleBgm.currentTime = 0;
 
     document.getElementById(
         "title-screen"
@@ -1003,7 +1015,10 @@ function startTitleGame() {
 
 
 
-
 createBoard();
 updateBestDisplay();
 draw();
+
+
+titleBgm.volume = 0.3;
+titleBgm.play();
