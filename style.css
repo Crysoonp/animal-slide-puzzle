@@ -217,7 +217,7 @@ h1 {
         "M PLUS Rounded 1c",
         sans-serif;
 
-    font-size: 24px;
+    font-size: 20px;
 
     font-weight: 700;
 
@@ -228,7 +228,7 @@ h1 {
 
     color: white;
 
-    padding: 12px 28px;
+    padding: 10px 20px;
 
     border-radius: 20px;
 
@@ -768,128 +768,84 @@ h1 {
 
 
 
+
+
+
+
+
+
+
 @media (max-width: 768px) {
 
+    /* 操作ボタン */
 
-.cancel-button {
+    .main-actions {
+        gap: 10px;
+    }
 
-    position: static;
-
-}
-
-.settings-button {
-
-    position: static;
-
-}
-
-.main-actions {
-
-    gap: 10px;
-
-}
+    .cancel-button,
+    .settings-button {
+        position: static;
+    }
 
 
+    /* 難易度 */
+
+    #difficulty-container {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    #difficulty-container button {
+        min-width: 80px;
+    }
+
+
+    /* プレイ情報・ベスト記録 */
 
     .info-container {
-
         display: flex;
-
         flex-direction: row;
-
         justify-content: center;
-
         gap: 10px;
-
         flex-wrap: nowrap;
-
     }
 
     .info-panel,
     .record-panel {
-
-        min-width: 140px;
-
+        min-width: 0;
+        width: 44%;
         padding: 5px;
-
         font-size: 14px;
-
     }
 
-}
 
-
-
-
-
-
-@media (max-width: 768px) {
+    /* クリア画面 */
 
     #clear-title {
-
         font-size: 48px;
-
         margin: 30px 0;
-
+        white-space: nowrap;
     }
 
     #clear-stats {
-
-        margin-top: 20px;
-
+        margin-top: 80px;
         margin-bottom: 20px;
-
         flex-direction: column;
-
-        gap: 10px;
-
+        gap: 5px;
     }
-
-    #clear-buttons {
-
-        margin-top: 20px;
-
-        flex-direction: column;
-
-    }
-
-}
-
-
-
-
-
-
-
-
-
-@media (max-width: 768px) {
 
     #clear-moves,
     #clear-time {
-
         font-size: 18px;
-
     }
 
-}
-
-
-
-
-
-
-
-@media (max-width: 768px) {
-
-    #clear-stats {
-
-        margin-top: 80px;
-
-        margin-bottom: 20px;
-
-        gap: 5px;
-
+    #clear-buttons {
+        margin-top: 20px;
+        flex-direction: column;
+        gap: 10px;
     }
 
 }

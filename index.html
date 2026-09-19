@@ -74,7 +74,6 @@
 
     </div>
 
-    <div id="game-screen">
 
 
 
@@ -84,92 +83,87 @@
 
         
 
+<div id="game-screen">
 
- <div class="main-actions">
+    <div id="difficulty-container"
+         class="difficulty-buttons">
 
-            <button id="cancel-button" class="cancel-button" onclick="cancelGame()" style="display:none;">
-                ⏹ 中止
-            </button>
+        <button id="diff-3"
+                onclick="setDifficulty(3)">
+            😊 初級
+        </button>
 
-            <button id="start-button" class="start-button" onclick="shuffle()" disabled>
+        <button id="diff-4"
+                onclick="setDifficulty(4)">
+            😎 中級
+        </button>
 
-                🎮 ゲーム開始
+        <button id="diff-5"
+                onclick="setDifficulty(5)">
+            🔥 上級
+        </button>
 
-            </button>
+        <button id="diff-6"
+                onclick="setDifficulty(6)">
+            👹 超級
+        </button>
 
-            <button class="settings-button" onclick="toggleSettings()">
-                ⚙️
-            </button>
+    </div>
 
-        </div>
+    <div class="main-actions">
 
+        <button id="cancel-button"
+                class="cancel-button"
+                onclick="cancelGame()"
+                style="display: none;">
+            ⏹ 中止
+        </button>
 
+        <button id="start-button"
+                class="start-button"
+                onclick="shuffle()"
+                disabled>
+            🎮 ゲーム開始
+        </button>
 
-       
+        <button class="settings-button"
+                onclick="toggleSettings()">
+            ⚙️
+        </button>
 
-
-
-
-
-
-
-        <div id="difficulty-container" class="difficulty-buttons">
-
-            <button id="diff-3" onclick="setDifficulty(3)">
-                😊 初級
-            </button>
-
-            <button id="diff-4" onclick="setDifficulty(4)">
-                😎 中級
-            </button>
-
-            <button id="diff-5" onclick="setDifficulty(5)">
-                🔥 上級
-            </button>
-
-            <button id="diff-6" onclick="setDifficulty(6)">
-                👹 超級
-            </button>
-
-        </div>
-
-
-
+    </div>
 
 
 
 
 
+    <div class="info-container">
 
+    <div class="info-panel">
 
+        <p id="moves">
+            🎯 移動回数: 0
+        </p>
 
-        <div class="info-container">
+        <p id="timer">
+            ⏰ 経過時間: 00:00
+        </p>
 
-            <div class="info-panel">
+    </div>
 
-                <h3>🎮 現在のプレイ</h3>
+    <div class="record-panel">
 
-                <p id="moves">🎯 移動回数: 0</p>
+        <p id="best">
+            🥇 最少移動回数: -
+        </p>
 
-                <p id="timer">⏰ 経過時間: 00:00</p>
+        <p id="best-time">
+            ⭐ 最短時間: -
+        </p>
 
-            </div>
+    </div>
 
-            <div class="record-panel">
-
-                <h3>🏆ベスト記録</h3>
-                <p id="best">
-                    🥇 最少移動回数: -
-                </p>
-
-                <p id="best-time">
-                    ⭐ 最短時間: -
-                </p>
-
-            </div>
-
-        </div>
-
+</div>
 
 
 
