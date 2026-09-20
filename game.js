@@ -412,6 +412,116 @@ let soundEffectsMasterGain = null;
 let gameBgmFadeGain = null;
 let audioGraphInitialized = false;
 
+const soundEffectBuffers = new Map();
+let soundEffectLoadPromise = null;
+
+const soundEffectFiles = new Map([
+    [moveSound, "sounds/move.mp3"],
+    [clearSound, "sounds/clear_fanfare.mp3"],
+    [selectSound, "sounds/select_difficulty.mp3"],
+    [buttonSound, "sounds/selection_sound.mp3"],
+    [titleStartSound, "sounds/title_start.mp3"],
+    [cancelSound, "sounds/cancel.mp3"]
+]);
+
+function loadSoundEffectBuffers() {
+    if (!audioContext) {
+        return Promise.resolve();
+    }
+
+    if (soundEffectLoadPromise) {
+        return soundEffectLoadPromise;
+    }
+
+    soundEffectLoadPromise = Promise.all(
+        Array.from(soundEffectFiles.entries()).map(
+            async function ([sound, filePath]) {
+                try {
+                    const response = await fetch(filePath);
+                    if (!response.ok) {
+                        throw new Error(
+                            "HTTP " + response.status
+                        );
+                    }
+
+                    const arrayBuffer =
+                        await response.arrayBuffer();
+                    const audioBuffer =
+                        await audioContext.decodeAudioData(
+                            arrayBuffer
+                        );
+
+                    soundEffectBuffers.set(
+                        sound,
+                        audioBuffer
+                    );
+                } catch (error) {
+                    console.log(
+                        "効果音の読み込みをスキップしました:",
+                        filePath,
+                        error
+                    );
+                }
+            }
+        )
+    );
+
+    return soundEffectLoadPromise;
+}
+
+function playSoundEffect(sound) {
+    initializeAudioGraph();
+
+    if (!soundEffectsEnabled || soundEffectsVolume <= 0) {
+        return Promise.resolve();
+    }
+
+    if (
+        audioContext
+        && audioContext.state === "suspended"
+    ) {
+        audioContext.resume().catch(function () {});
+    }
+
+    const buffer = soundEffectBuffers.get(sound);
+
+    if (
+        audioGraphInitialized
+        && audioContext
+        && soundEffectsMasterGain
+        && buffer
+    ) {
+        const source = audioContext.createBufferSource();
+        source.buffer = buffer;
+        source.connect(soundEffectsMasterGain);
+        source.start(0);
+        return Promise.resolve();
+    }
+
+    return loadSoundEffectBuffers().then(function () {
+        const loadedBuffer = soundEffectBuffers.get(sound);
+
+        if (
+            loadedBuffer
+            && audioContext
+            && soundEffectsMasterGain
+        ) {
+            const source = audioContext.createBufferSource();
+            source.buffer = loadedBuffer;
+            source.connect(soundEffectsMasterGain);
+            source.start(0);
+            return;
+        }
+
+        sound.volume = soundEffectsVolume;
+        sound.muted = !soundEffectsEnabled;
+        sound.currentTime = 0;
+        return sound.play();
+    }).catch(function () {
+        /* 効果音が鳴らなくてもゲーム処理は続ける */
+    });
+}
+
 function initializeAudioGraph() {
     if (audioGraphInitialized) {
         if (audioContext && audioContext.state === "suspended") {
@@ -443,15 +553,16 @@ function initializeAudioGraph() {
         gameBgmFadeGain.connect(bgmMasterGain);
         bgmMasterGain.connect(audioContext.destination);
 
-        soundEffects.forEach(function (sound) {
-            const source =
-                audioContext.createMediaElementSource(sound);
-            source.connect(soundEffectsMasterGain);
-            sound.volume = 1;
-            sound.muted = false;
-        });
-        soundEffectsMasterGain.connect(audioContext.destination);
+        soundEffectsMasterGain.connect(
+            audioContext.destination
+        );
 
+        soundEffects.forEach(function (sound) {
+            sound.volume = soundEffectsVolume;
+            sound.muted = !soundEffectsEnabled;
+        });
+
+        loadSoundEffectBuffers();
         titleBgm.volume = 1;
         titleBgm.muted = false;
         gameBgm.volume = 1;
@@ -959,7 +1070,7 @@ function changeLanguage(language) {
 
     buttonSound.currentTime = 0;
 
-    buttonSound.play().catch(
+    playSoundEffect(buttonSound).catch(
         function () {
             /*
              * 効果音を再生できない場合でも
@@ -1112,7 +1223,7 @@ function closeSettings() {
 
     buttonSound.currentTime = 0;
 
-    buttonSound.play().catch(function () {
+    playSoundEffect(buttonSound).catch(function () {
         /*
          * 効果音を再生できない場合でも
          * 設定画面は閉じる
@@ -1246,7 +1357,7 @@ function closeClearPanel() {
     );
 
     buttonSound.currentTime = 0;
-    buttonSound.play();
+    playSoundEffect(buttonSound);
 
     clearPanel.classList.remove(
         "show"
@@ -1396,7 +1507,7 @@ function updateNumberHintButton() {
 function toggleNumberHint() {
 
     buttonSound.currentTime = 0;
-    buttonSound.play();
+    playSoundEffect(buttonSound);
 
     if (
         !gameStarted ||
@@ -1419,7 +1530,7 @@ function toggleNumberHint() {
 function toggleOriginal() {
 
     buttonSound.currentTime = 0;
-    buttonSound.play();
+    playSoundEffect(buttonSound);
 
     originalContainer.style.display =
         "flex";
@@ -1436,7 +1547,7 @@ function toggleOriginal() {
 function closeOriginal() {
 
     buttonSound.currentTime = 0;
-    buttonSound.play();
+    playSoundEffect(buttonSound);
 
     originalContainer.style.display =
         "none";
@@ -1512,7 +1623,7 @@ function setAnimalMode(mode) {
 
     buttonSound.currentTime = 0;
 
-    buttonSound.play().catch(
+    playSoundEffect(buttonSound).catch(
         function () {
             /*
              * 音が鳴らなくても
@@ -2243,7 +2354,7 @@ function moveTile(index) {
 
     moveSound.currentTime = 0;
 
-    moveSound.play().catch(function () {
+    playSoundEffect(moveSound).catch(function () {
         /*
          * 効果音を再生できない場合でも
          * タイル移動は続ける
@@ -2311,7 +2422,7 @@ function moveTile(index) {
 function setDifficulty(size) {
 
     selectSound.currentTime = 0;
-    selectSound.play();
+    playSoundEffect(selectSound);
 
     clearPanel.classList.remove("show");
 
@@ -2380,7 +2491,7 @@ function cancelGame() {
 
     cancelSound.currentTime = 0;
 
-    cancelSound.play().catch(error => {
+    playSoundEffect(cancelSound).catch(error => {
         console.log(
             "キャンセル音を再生できませんでした:",
             error
@@ -2582,7 +2693,7 @@ function shuffle() {
     );
 
     buttonSound.currentTime = 0;
-    buttonSound.play();
+    playSoundEffect(buttonSound);
 
     gameStarted = true;
 
@@ -2775,7 +2886,7 @@ function checkClear() {
         clearSound.pause();
         clearSound.currentTime = 0;
 
-        clearSound.play().catch(function (error) {
+        playSoundEffect(clearSound).catch(function (error) {
 
             console.log(
                 "クリア音を再生できませんでした:",
@@ -2986,7 +3097,7 @@ function startTitleGame(event) {
 
     titleStartSound.currentTime = 0;
 
-    titleStartSound.play().catch(error => {
+    playSoundEffect(titleStartSound).catch(error => {
         console.log(
             "タイトル開始音を再生できませんでした:",
             error
