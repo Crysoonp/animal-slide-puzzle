@@ -198,7 +198,15 @@ confirmResetBestTime:
     "{difficulty}の最短時間をリセットしますか？",
 
 confirmResetAllRecords:
-    "すべての難易度の最少移動回数と最短時間をリセットしますか？"
+    "すべての難易度の最少移動回数と最短時間をリセットしますか？",
+clearMovesLabel:
+    "移動回数",
+clearTimeLabel:
+    "クリア時間",
+playAgain:
+    "もう一回遊ぶ",
+moveCountSuffix:
+    "回"
 
     },
 
@@ -314,7 +322,15 @@ confirmResetBestTime:
     "Reset the best time record for {difficulty}?",
 
 confirmResetAllRecords:
-    "Reset all records for every difficulty?"
+    "Reset all records for every difficulty?",
+clearMovesLabel:
+    "Moves",
+clearTimeLabel:
+    "Clear Time",
+playAgain:
+    "Play Again",
+moveCountSuffix:
+    ""
 
 
     }
@@ -740,6 +756,37 @@ function applyLanguage() {
     }
 
 
+    const clearMovesLabel =
+        document.getElementById(
+            "clear-moves-label"
+        );
+
+    const clearTimeLabel =
+        document.getElementById(
+            "clear-time-label"
+        );
+
+    const clearReplayButton =
+        document.getElementById(
+            "clear-replay-button"
+        );
+
+    if (clearMovesLabel) {
+        clearMovesLabel.textContent =
+            "🎯 " + text.clearMovesLabel;
+    }
+
+    if (clearTimeLabel) {
+        clearTimeLabel.textContent =
+            "⏱ " + text.clearTimeLabel;
+    }
+
+    if (clearReplayButton) {
+        clearReplayButton.textContent =
+            "↻ " + text.playAgain;
+    }
+
+
     updateSoundButtons();
 
     updateMovesDisplay();
@@ -749,6 +796,8 @@ function applyLanguage() {
     updateBestDisplay();
 
     updateNumberHintButton();
+
+    updateClearResultDisplay();
 
     updateLanguageButtons();
 
@@ -1533,6 +1582,21 @@ function updateTimerDisplay() {
         + formatTime(seconds);
 
 }
+
+function updateClearResultDisplay() {
+
+    if (!clearMoves || !clearTime) {
+        return;
+    }
+
+    clearMoves.textContent =
+        moves + getText("moveCountSuffix");
+
+    clearTime.textContent =
+        formatTime(seconds);
+
+}
+
 
 
 
@@ -2685,25 +2749,7 @@ function checkClear() {
             "cancel-button"
         ).style.display = "none";
 
-
-
-
-
-
-
-        clearMoves.textContent =
-            moves + "回";
-
-        const clearMinutes =
-            Math.floor(seconds / 60);
-
-        const clearSeconds =
-            seconds % 60;
-
-        clearTime.textContent =
-            String(clearMinutes).padStart(2, "0")
-            + ":"
-            + String(clearSeconds).padStart(2, "0");
+        updateClearResultDisplay();
 
 
         setTimeout(function () {
