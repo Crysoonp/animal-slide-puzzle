@@ -164,8 +164,41 @@ const translations = {
         on:
             "ON",
 
-        off:
-            "OFF"
+off:
+    "OFF",
+
+bgm:
+    "BGM",
+
+bgmVolume:
+    "BGM音量",
+
+soundEffects:
+    "効果音",
+
+soundVolume:
+    "効果音量",
+
+resetFewestMoves:
+    "最少移動回数をリセット",
+
+resetBestTime:
+    "最短時間をリセット",
+
+resetAllRecords:
+    "全記録をリセット",
+
+close:
+    "閉じる",
+
+confirmResetFewestMoves:
+    "{difficulty}の最少移動回数をリセットしますか？",
+
+confirmResetBestTime:
+    "{difficulty}の最短時間をリセットしますか？",
+
+confirmResetAllRecords:
+    "すべての難易度の最少移動回数と最短時間をリセットしますか？"
 
     },
 
@@ -247,8 +280,41 @@ const translations = {
         on:
             "ON",
 
-        off:
-            "OFF"
+off:
+    "OFF",
+
+bgm:
+    "BGM",
+
+bgmVolume:
+    "BGM Volume",
+
+soundEffects:
+    "Sound Effects",
+
+soundVolume:
+    "Sound Volume",
+
+resetFewestMoves:
+    "Reset Fewest Moves",
+
+resetBestTime:
+    "Reset Best Time",
+
+resetAllRecords:
+    "Reset All Records",
+
+close:
+    "Close",
+
+confirmResetFewestMoves:
+    "Reset the fewest moves record for {difficulty}?",
+
+confirmResetBestTime:
+    "Reset the best time record for {difficulty}?",
+
+confirmResetAllRecords:
+    "Reset all records for every difficulty?"
 
 
     }
@@ -610,6 +676,72 @@ function applyLanguage() {
     }
 
 
+
+
+        const bgmVolumeLabel =
+        document.getElementById(
+            "bgm-volume-label"
+        );
+
+    const soundVolumeLabel =
+        document.getElementById(
+            "se-volume-label"
+        );
+
+    const resetBestScoreButton =
+        document.getElementById(
+            "reset-best-score-button"
+        );
+
+    const resetBestTimeButton =
+        document.getElementById(
+            "reset-best-time-button"
+        );
+
+    const resetAllRecordsButton =
+        document.getElementById(
+            "reset-all-records-button"
+        );
+
+    const settingsCloseButton =
+        document.getElementById(
+            "settings-close-button"
+        );
+
+
+    if (bgmVolumeLabel) {
+        bgmVolumeLabel.textContent =
+            text.bgmVolume;
+    }
+
+    if (soundVolumeLabel) {
+        soundVolumeLabel.textContent =
+            text.soundVolume;
+    }
+
+    if (resetBestScoreButton) {
+        resetBestScoreButton.textContent =
+            text.resetFewestMoves;
+    }
+
+    if (resetBestTimeButton) {
+        resetBestTimeButton.textContent =
+            text.resetBestTime;
+    }
+
+    if (resetAllRecordsButton) {
+        resetAllRecordsButton.textContent =
+            text.resetAllRecords;
+    }
+
+    if (settingsCloseButton) {
+        settingsCloseButton.textContent =
+            text.close;
+    }
+
+
+    updateSoundButtons();
+
     updateMovesDisplay();
 
     updateTimerDisplay();
@@ -617,8 +749,6 @@ function applyLanguage() {
     updateBestDisplay();
 
     updateNumberHintButton();
-
-
 
     updateLanguageButtons();
 
@@ -660,7 +790,6 @@ function changeLanguage(language) {
 
 
 
-
 function updateSoundButtons() {
 
     const bgmButton =
@@ -673,21 +802,43 @@ function updateSoundButtons() {
             "se-toggle-button"
         );
 
+
     if (bgmButton) {
 
         bgmButton.textContent =
-            bgmEnabled
-                ? "🎵 BGM：ON"
-                : "🔇 BGM：OFF";
+            (
+                bgmEnabled
+                    ? "🎵 "
+                    : "🔇 "
+            )
+            + getText("bgm")
+            + ": "
+            + getText(
+                bgmEnabled
+                    ? "on"
+                    : "off"
+            );
 
     }
+
 
     if (seButton) {
 
         seButton.textContent =
-            soundEffectsEnabled
-                ? "🔊 効果音：ON"
-                : "🔇 効果音：OFF";
+            (
+                soundEffectsEnabled
+                    ? "🔊 "
+                    : "🔇 "
+            )
+            + getText(
+                "soundEffects"
+            )
+            + ": "
+            + getText(
+                soundEffectsEnabled
+                    ? "on"
+                    : "off"
+            );
 
     }
 
@@ -842,40 +993,37 @@ function closeSettings() {
 
 
 
-
 function getDifficultyName() {
 
-    const difficultyNames = {
-
-        3: "初級",
-
-        4: "中級",
-
-        5: "上級",
-
-        6: "超級"
-
+    const difficultyKeys = {
+        3: "difficultyEasy",
+        4: "difficultyNormal",
+        5: "difficultyHard",
+        6: "difficultyExpert"
     };
 
-    return difficultyNames[boardSize];
+    return getText(
+        difficultyKeys[boardSize]
+    );
 
 }
 
 
 
 
-
-
 function resetBestScore() {
 
-    const difficultyName =
-        getDifficultyName();
+    const confirmMessage =
+        getText(
+            "confirmResetFewestMoves"
+        ).replace(
+            "{difficulty}",
+            getDifficultyName()
+        );
 
     if (
         confirm(
-            difficultyName
-            + "の最少移動回数を"
-            + "リセットしますか？"
+            confirmMessage
         )
     ) {
 
@@ -892,16 +1040,21 @@ function resetBestScore() {
 
 
 
+
+
 function resetBestTime() {
 
-    const difficultyName =
-        getDifficultyName();
+    const confirmMessage =
+        getText(
+            "confirmResetBestTime"
+        ).replace(
+            "{difficulty}",
+            getDifficultyName()
+        );
 
     if (
         confirm(
-            difficultyName
-            + "の最短時間を"
-            + "リセットしますか？"
+            confirmMessage
         )
     ) {
 
@@ -916,35 +1069,36 @@ function resetBestTime() {
 }
 
 
-
-
 function resetAllRecords() {
 
     if (
         confirm(
-            "すべての難易度の"
-            + "最少移動回数と最短時間を"
-            + "リセットしますか？"
+            getText(
+                "confirmResetAllRecords"
+            )
         )
     ) {
 
-        [3, 4, 5, 6].forEach(function (size) {
+        [3, 4, 5, 6].forEach(
+            function (size) {
 
-            localStorage.removeItem(
-                "bestScore_" + size
-            );
+                localStorage.removeItem(
+                    "bestScore_" + size
+                );
 
-            localStorage.removeItem(
-                "bestTime_" + size
-            );
+                localStorage.removeItem(
+                    "bestTime_" + size
+                );
 
-        });
+            }
+        );
 
         updateBestDisplay();
 
     }
 
 }
+
 
 
 
