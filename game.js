@@ -135,8 +135,41 @@ const translations = {
             "ゲーム開始",
 
         settings:
-            "設定"
+            "設定",
+
+        gameInfo:
+            "プレイ情報",
+
+        moves:
+            "移動回数",
+
+        time:
+            "経過時間",
+
+        bestRecords:
+            "ベスト記録",
+
+        fewestMoves:
+            "最少移動回数",
+
+        bestTime:
+            "最短時間",
+
+        fullImage:
+            "完成図",
+
+        numberHint:
+            "番号ヒント",
+
+        on:
+            "ON",
+
+        off:
+            "OFF"
+
     },
+
+
 
     en: {
         pageTitle:
@@ -185,7 +218,39 @@ const translations = {
             "Start Game",
 
         settings:
-            "Settings"
+            "Settings",
+
+        gameInfo:
+            "Game Info",
+
+        moves:
+            "Moves",
+
+        time:
+            "Time",
+
+        bestRecords:
+            "Best Records",
+
+        fewestMoves:
+            "Fewest Moves",
+
+        bestTime:
+            "Best Time",
+
+        fullImage:
+            "Full Image",
+
+        numberHint:
+            "Number Hint",
+
+        on:
+            "ON",
+
+        off:
+            "OFF"
+
+
     }
 
 };
@@ -509,6 +574,50 @@ function applyLanguage() {
         settingsTitleText.textContent =
             text.settings;
     }
+
+
+
+
+    const gameInfoTitle =
+        document.getElementById(
+            "game-info-title"
+        );
+
+    const bestRecordsTitle =
+        document.getElementById(
+            "best-records-title"
+        );
+
+    const fullImageButton =
+        document.getElementById(
+            "original-button"
+        );
+
+
+    if (gameInfoTitle) {
+        gameInfoTitle.textContent =
+            text.gameInfo;
+    }
+
+    if (bestRecordsTitle) {
+        bestRecordsTitle.textContent =
+            text.bestRecords;
+    }
+
+    if (fullImageButton) {
+        fullImageButton.textContent =
+            "🖼️ " + text.fullImage;
+    }
+
+
+    updateMovesDisplay();
+
+    updateTimerDisplay();
+
+    updateBestDisplay();
+
+    updateNumberHintButton();
+
 
 
     updateLanguageButtons();
@@ -974,9 +1083,14 @@ function updateNumberHintButton() {
     }
 
     numberHintButton.textContent =
-        numberHintEnabled
-            ? "🔢 番号ヒント：ON"
-            : "🔢 番号ヒント：OFF";
+        "🔢 "
+        + getText("numberHint")
+        + ": "
+        + (
+            numberHintEnabled
+                ? getText("on")
+                : getText("off")
+        );
 
     numberHintButton.classList.toggle(
         "hint-enabled",
@@ -984,6 +1098,9 @@ function updateNumberHintButton() {
     );
 
 }
+
+
+
 
 
 function toggleNumberHint() {
@@ -1148,6 +1265,10 @@ function getSelectedImageList() {
 
 
 
+
+
+
+
 function randomImage() {
 
     const selectedImages =
@@ -1211,52 +1332,88 @@ function getBestTime() {
 }
 
 
+function formatTime(totalSeconds) {
 
+    const minutes =
+        Math.floor(
+            totalSeconds / 60
+        );
+
+    const remainSeconds =
+        totalSeconds % 60;
+
+    return (
+        String(minutes).padStart(
+            2,
+            "0"
+        )
+        + ":"
+        + String(
+            remainSeconds
+        ).padStart(
+            2,
+            "0"
+        )
+    );
+
+}
+
+
+function updateMovesDisplay() {
+
+    movesText.textContent =
+        "🎯 "
+        + getText("moves")
+        + ": "
+        + moves;
+
+}
+
+
+function updateTimerDisplay() {
+
+    timerText.textContent =
+        "⏱ "
+        + getText("time")
+        + ": "
+        + formatTime(seconds);
+
+}
 
 
 
 function updateBestDisplay() {
 
-    const bestScore = getBestScore();
+    const bestScore =
+        getBestScore();
 
-    if (bestScore !== null) {
+    bestText.textContent =
+        "🏅 "
+        + getText("fewestMoves")
+        + ": "
+        + (
+            bestScore !== null
+                ? bestScore
+                : "-"
+        );
 
-        bestText.textContent =
-            "🥇 最少移動回数: " + bestScore;
-
-    } else {
-
-        bestText.textContent = "🥇 最少移動回数: -";
-
-    }
 
     const bestTime =
         getBestTime();
 
-    if (bestTime !== null) {
+    bestTimeText.textContent =
+        "⭐ "
+        + getText("bestTime")
+        + ": "
+        + (
+            bestTime !== null
+                ? formatTime(
+                    Number(bestTime)
+                )
+                : "-"
+        );
 
-        const minutes =
-            Math.floor(bestTime / 60);
-
-        const remainSeconds =
-            bestTime % 60;
-
-        bestTimeText.textContent =
-            "⭐ 最短時間: "
-            + String(minutes).padStart(2, "0")
-            + ":"
-            + String(remainSeconds).padStart(2, "0");
-
-    } else {
-
-        bestTimeText.textContent =
-            "⭐ 最短時間: -";
-
-    }
 }
-
-
-
 
 
 
@@ -1823,8 +1980,7 @@ function moveTile(index) {
 
             moves++;
 
-            movesText.textContent =
-                "🎯 移動回数: " + moves;
+            updateMovesDisplay();
 
             isTileAnimating = false;
 
@@ -1888,11 +2044,9 @@ function setDifficulty(size) {
     seconds = 0;
     moves = 0;
 
-    movesText.textContent =
-        "🎯 移動回数: 0";
+    updateMovesDisplay();
 
-    timerText.textContent =
-        "⏱ 経過時間: 00:00";
+    updateTimerDisplay();
 
     updateDifficultyButtons();
 
@@ -1950,11 +2104,9 @@ function cancelGame() {
     moves = 0;
     seconds = 0;
 
-    movesText.textContent =
-        "🎯 移動回数: 0";
+    updateMovesDisplay();
 
-    timerText.textContent =
-        "⏱ 経過時間: 00:00";
+    updateTimerDisplay();
 
     setDifficultyButtonsDisabled(false);
 
@@ -2230,8 +2382,9 @@ function shuffle() {
     moves = 0;
     seconds = 0;
 
-    movesText.textContent = "🎯 移動回数: 0";
-    timerText.textContent = "⏱ 経過時間: 00:00";
+    updateMovesDisplay();
+
+    updateTimerDisplay();
 
     message.textContent = "";
 
@@ -2259,20 +2412,11 @@ function shuffle() {
 
 
 
-
-
 function updateTimer() {
 
     seconds++;
 
-    const minutes = Math.floor(seconds / 60);
-    const remainSeconds = seconds % 60;
-
-    timerText.textContent =
-        "⏱ 経過時間: " +
-        String(minutes).padStart(2, "0") +
-        ":" +
-        String(remainSeconds).padStart(2, "0");
+    updateTimerDisplay();
 
 }
 
