@@ -206,7 +206,19 @@ clearTimeLabel:
 playAgain:
     "もう一回遊ぶ",
 moveCountSuffix:
-    "回"
+    "回",
+
+titleBgmGuide:
+    "🔊 画面をタップするとBGMが流れます",
+
+originalTitle:
+    "完成図",
+
+originalClose:
+    "閉じる",
+
+originalImageAlt:
+    "パズルの完成図"
 
     },
 
@@ -330,7 +342,19 @@ clearTimeLabel:
 playAgain:
     "Play Again",
 moveCountSuffix:
-    ""
+    "",
+
+titleBgmGuide:
+    "🔊 Tap the screen to play BGM",
+
+originalTitle:
+    "Full Image",
+
+originalClose:
+    "Close",
+
+originalImageAlt:
+    "Completed puzzle image"
 
 
     }
@@ -753,6 +777,38 @@ function applyLanguage() {
     if (settingsCloseButton) {
         settingsCloseButton.textContent =
             text.close;
+    }
+
+
+    const originalTitleText =
+        document.getElementById(
+            "original-title-text"
+        );
+
+    const originalCloseButton =
+        document.getElementById(
+            "original-close-button"
+        );
+
+
+    if (titleBgmGuide) {
+        titleBgmGuide.textContent =
+            text.titleBgmGuide;
+    }
+
+    if (originalTitleText) {
+        originalTitleText.textContent =
+            text.originalTitle;
+    }
+
+    if (originalCloseButton) {
+        originalCloseButton.textContent =
+            text.originalClose;
+    }
+
+    if (originalImage) {
+        originalImage.alt =
+            text.originalImageAlt;
     }
 
 
