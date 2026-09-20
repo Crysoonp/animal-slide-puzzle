@@ -288,23 +288,10 @@ h1 {
 
 
 
-.settings-button {
-
-    position: absolute;
-
-    left: calc(50% + 120px);
-
-}
-
 
 
 
 .cancel-button {
-
-
-    position: absolute;
-
-    right: calc(50% + 120px);
 
     background:
         linear-gradient(to bottom,
@@ -377,22 +364,6 @@ h1 {
 }
 
 
-
-
-
-.main-actions {
-
-    position: relative;
-
-    display: flex;
-
-    justify-content: center;
-
-    align-items: center;
-
-    margin-bottom: 20px;
-
-}
 
 
 
@@ -2636,3 +2607,176 @@ h1 {
     box-shadow:
         0 5px 11px rgba(0, 0, 0, 0.18);
 }
+
+
+
+
+/* 画像モード選択エリア */
+.mode-section {
+    width: 100%;
+    max-width: 484px;
+
+    margin: 4px auto 14px;
+
+    box-sizing: border-box;
+}
+
+
+/* 画像モードの見出し */
+.mode-section-title {
+    margin-bottom: 7px;
+
+    color: #68717b;
+
+    font-family:
+        "M PLUS Rounded 1c",
+        sans-serif;
+
+    font-size: 12px;
+    font-weight: 900;
+
+    letter-spacing: 1px;
+}
+
+
+/* 画像モードボタンの配置 */
+#animal-mode-container {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+    gap: 8px;
+
+    width: 100%;
+}
+
+
+/* 画像モードボタン */
+#animal-mode-container button {
+    min-width: 0;
+    min-height: 42px;
+
+    padding: 8px 6px;
+
+    color: #4d5660;
+
+    background:
+        rgba(255, 255, 255, 0.86);
+
+    border:
+        1px solid
+        rgba(0, 0, 0, 0.08);
+
+    border-radius: 15px;
+
+    box-shadow:
+        0 3px 8px
+        rgba(0, 0, 0, 0.1);
+
+    font-family:
+        "M PLUS Rounded 1c",
+        sans-serif;
+
+    font-size: 13px;
+    font-weight: 800;
+
+    white-space: nowrap;
+
+    text-shadow: none;
+}
+
+
+/* 選択中の画像モード */
+#animal-mode-container
+button.selected-animal-mode {
+    color: white;
+
+    background:
+        linear-gradient(
+            145deg,
+            #69d77d,
+            #3fae58
+        );
+
+    border-color: #3f9e52;
+
+    box-shadow:
+        0 5px 12px
+        rgba(48, 140, 69, 0.28);
+}
+
+
+/* スマホでは2列にする */
+@media (max-width: 520px) {
+
+    .mode-section {
+        margin:
+            2px auto 12px;
+    }
+
+    #animal-mode-container {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+        gap: 7px;
+    }
+
+    #animal-mode-container button {
+        min-height: 40px;
+
+        font-size: 12px;
+    }
+
+}
+
+
+
+
+
+
+
+
+/* プレイ中は画像モードと難易度選択を隠す */
+#game-screen.game-playing .mode-section,
+#game-screen.game-playing #difficulty-container {
+    display: none;
+}
+
+
+/* プレイ中は上側の余白も縮める */
+#game-screen.game-playing .main-actions {
+    margin-top: 0;
+}
+
+
+
+
+
+
+
+@media (max-width: 768px) {
+
+    #game-screen.game-playing .main-actions {
+        margin:
+            0 auto 8px;
+    }
+
+    #game-screen.game-playing .info-container {
+        margin:
+            0 auto 7px;
+    }
+
+    #game-screen.game-playing #game {
+        margin:
+            6px auto 8px;
+    }
+
+}
+
+
+
+
+
+
+

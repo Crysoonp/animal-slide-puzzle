@@ -39,6 +39,11 @@ gameBgm.volume = 0;
 const titleScreen =
     document.getElementById("title-screen");
 
+const gameScreen =
+    document.getElementById(
+        "game-screen"
+    );
+
 const titleBgmGuide =
     document.getElementById(
         "title-bgm-guide"
@@ -430,19 +435,72 @@ function resetAllRecords() {
 
 function closeClearPanel() {
 
+    gameScreen.classList.remove(
+        "game-playing"
+    );
+
     buttonSound.currentTime = 0;
     buttonSound.play();
 
-    clearPanel.classList.remove("show");
+    clearPanel.classList.remove(
+        "show"
+    );
 
-    clearPanel.style.display = "none";
+    clearPanel.style.display =
+        "none";
 
-    document.body.style.overflow = "";
+    document.body.style.overflow =
+        "";
 
-    setDifficultyButtonsDisabled(false);
+    gameStarted = false;
+
+    selectedAnimalMode = null;
+    selectedDifficulty = null;
+
+    document
+        .querySelectorAll(
+            "#animal-mode-container button"
+        )
+        .forEach(function (button) {
+
+            button.classList.remove(
+                "selected-animal-mode"
+            );
+
+        });
+
+    document
+        .querySelectorAll(
+            "#difficulty-container button"
+        )
+        .forEach(function (button) {
+
+            button.classList.remove(
+                "selected-difficulty"
+            );
+
+        });
+
+    setDifficultyButtonsDisabled(
+        false
+    );
+
+    document.getElementById(
+        "start-button"
+    ).disabled = true;
+
+    document.getElementById(
+        "cancel-button"
+    ).style.display = "none";
+
+    document.getElementById(
+        "original-button"
+    ).style.display = "none";
+
+    numberHintButton.style.display =
+        "none";
 
 }
-
 
 
 
@@ -586,22 +644,147 @@ originalContainer.addEventListener(
 
 
 
+
+
+function updateStartButtonState() {
+
+    const startButton =
+        document.getElementById(
+            "start-button"
+        );
+
+    startButton.disabled =
+        selectedAnimalMode === null ||
+        selectedDifficulty === null;
+
+}
+
+
+
+
+
+function setAnimalMode(mode) {
+
+    if (gameStarted && !isSolved) {
+        return;
+    }
+
+    selectedAnimalMode = mode;
+
+    document
+        .querySelectorAll(
+            "#animal-mode-container button"
+        )
+        .forEach(function (button) {
+
+            button.classList.remove(
+                "selected-animal-mode"
+            );
+
+        });
+
+    const selectedButton =
+        document.getElementById(
+            "animal-mode-" + mode
+        );
+
+    if (selectedButton) {
+
+        selectedButton.classList.add(
+            "selected-animal-mode"
+        );
+
+    }
+
+    buttonSound.currentTime = 0;
+
+    buttonSound.play().catch(
+        function () {
+            /*
+             * 音が鳴らなくても
+             * モード変更は続ける
+             */
+        }
+    );
+
+    updateStartButtonState();
+
+}
+
+
+
+
+
+
+
+function getSelectedImageList() {
+
+    if (selectedAnimalMode === "cats") {
+        return imageLists.cats;
+    }
+
+    if (selectedAnimalMode === "dogs") {
+        return imageLists.dogs;
+    }
+
+    if (
+        selectedAnimalMode ===
+        "otherAnimals"
+    ) {
+        return imageLists.otherAnimals;
+    }
+
+    return allImages;
+
+}
+
+
+
+
 function randomImage() {
+
+    const selectedImages =
+        getSelectedImageList();
+
+    if (selectedImages.length === 0) {
+
+        console.error(
+            "選択中のモードに画像がありません。"
+        );
+
+        return;
+
+    }
+
+    let availableImages =
+        selectedImages.filter(
+            function (image) {
+
+                return image !== currentImage;
+
+            }
+        );
+
+    if (availableImages.length === 0) {
+
+        availableImages =
+            selectedImages;
+
+    }
 
     const randomIndex =
         Math.floor(
-            Math.random() * imageList.length
+            Math.random()
+            * availableImages.length
         );
 
     currentImage =
-        imageList[randomIndex];
+        availableImages[randomIndex];
 
     originalImage.src =
         "images/" + currentImage;
 
-
 }
-
 
 
 
@@ -690,7 +873,7 @@ function updateBestDisplay() {
 
 let boardSize = 3;
 
-let selectedDifficulty = 3;
+let selectedDifficulty = null;
 
 let gameStarted = false;
 
@@ -700,33 +883,9 @@ let seconds = 0;
 
 let timer = null;
 
-let currentImage = "cat.jpg";
+let currentImage = "";
 
-const imageList = [
-    "amusement_park.jpg",
-    "balloon.jpg",
-    "bird.jpg",
-    "butterflies.jpg",
-    "car.jpg",
-    "castle_japan.jpg",
-    "castle.jpg",
-    "cat.jpg",
-    "cloud.jpg",
-    "dog.jpg",
-    "fish.jpg",
-    "fruit_tart.jpg",
-    "library.jpg",
-    "ship.jpg",
-    "ship.jpg",
-    "toy_room.jpg",
-    "train.jpg",
-    "vegetables.jpg",
-    "winter_cabin.jpg",
-
-
-];
-
-
+let selectedAnimalMode = null;
 
 let BOARD_SIZE_PX =
     calculateBoardSize();
@@ -1321,9 +1480,7 @@ function setDifficulty(size) {
 
     draw();
 
-    document.getElementById(
-        "start-button"
-    ).disabled = false;
+    updateStartButtonState();
 
 }
 
@@ -1338,6 +1495,9 @@ function setDifficulty(size) {
 
 function cancelGame() {
 
+    gameScreen.classList.remove(
+        "game-playing"
+    );
 
     cancelSound.currentTime = 0;
 
@@ -1406,16 +1566,29 @@ function cancelGame() {
 
 
 
-
-function setDifficultyButtonsDisabled(disabled) {
+function setDifficultyButtonsDisabled(
+    disabled
+) {
 
     document
         .querySelectorAll(
             "#difficulty-container button"
         )
-        .forEach(button => {
+        .forEach(function (button) {
 
-            button.disabled = disabled;
+            button.disabled =
+                disabled;
+
+        });
+
+    document
+        .querySelectorAll(
+            "#animal-mode-container button"
+        )
+        .forEach(function (button) {
+
+            button.disabled =
+                disabled;
 
         });
 
@@ -1524,6 +1697,10 @@ function stopGameBgm() {
 
 
 function shuffle() {
+
+    gameScreen.classList.add(
+        "game-playing"
+    );
 
     buttonSound.currentTime = 0;
     buttonSound.play();
@@ -1787,18 +1964,6 @@ function checkClear() {
 
 
 
-function selectDifficulty(level) {
-
-    difficulty = level;
-
-    document.getElementById(
-        "start-button"
-    ).disabled = false;
-
-}
-
-
-
 function startTitleBgm() {
 
 
@@ -2004,6 +2169,8 @@ if (!bgmEnabled) {
 }
 
 updateNumberHintButton();
+
+updateStartButtonState();
 
 numberHintButton.style.display =
     "none";

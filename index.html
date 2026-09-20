@@ -89,6 +89,42 @@
 
     <div id="game-screen">
 
+        <div class="mode-section">
+
+            <div class="mode-section-title">
+                遊ぶ画像
+            </div>
+
+            <div id="animal-mode-container">
+
+                <button id="animal-mode-all" type="button" onclick="setAnimalMode('all')">
+
+                    おまかせ
+
+                </button>
+
+                <button id="animal-mode-dogs" type="button" onclick="setAnimalMode('dogs')">
+
+                    わんこ
+
+                </button>
+
+                <button id="animal-mode-cats" type="button" onclick="setAnimalMode('cats')">
+
+                    にゃんこ
+
+                </button>
+
+                <button id="animal-mode-otherAnimals" type="button" onclick="setAnimalMode('otherAnimals')">
+
+                    ほかの動物
+
+                </button>
+
+            </div>
+
+        </div>
+
         <div id="difficulty-container" class="difficulty-buttons">
 
             <button id="diff-3" type="button" onclick="setDifficulty(3)">
@@ -314,7 +350,7 @@
                     🖼️ 完成図
                 </h2>
 
-                <img id="original-image" src="images/cat.jpg" inal-close-button">
+                <img id="original-image" src="images/cat.jpg" alt="パズルの完成図tton">
 
                 閉じる
 
@@ -399,6 +435,7 @@
 
     </div>
 
+    <script src="image-list.js"></script>
 
     <script src="game.js"></script>
 
