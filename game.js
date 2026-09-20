@@ -406,34 +406,114 @@ const soundEffects = [
     cancelSound
 ];
 
+let audioContext = null;
+let bgmMasterGain = null;
+let soundEffectsMasterGain = null;
+let gameBgmFadeGain = null;
+let audioGraphInitialized = false;
+
+function initializeAudioGraph() {
+    if (audioGraphInitialized) {
+        if (audioContext && audioContext.state === "suspended") {
+            audioContext.resume().catch(function () {});
+        }
+        return;
+    }
+
+    const AudioContextClass =
+        window.AudioContext || window.webkitAudioContext;
+
+    if (!AudioContextClass) {
+        return;
+    }
+
+    try {
+        audioContext = new AudioContextClass();
+        bgmMasterGain = audioContext.createGain();
+        soundEffectsMasterGain = audioContext.createGain();
+        gameBgmFadeGain = audioContext.createGain();
+
+        const titleBgmSource =
+            audioContext.createMediaElementSource(titleBgm);
+        const gameBgmSource =
+            audioContext.createMediaElementSource(gameBgm);
+
+        titleBgmSource.connect(bgmMasterGain);
+        gameBgmSource.connect(gameBgmFadeGain);
+        gameBgmFadeGain.connect(bgmMasterGain);
+        bgmMasterGain.connect(audioContext.destination);
+
+        soundEffects.forEach(function (sound) {
+            const source =
+                audioContext.createMediaElementSource(sound);
+            source.connect(soundEffectsMasterGain);
+            sound.volume = 1;
+            sound.muted = false;
+        });
+        soundEffectsMasterGain.connect(audioContext.destination);
+
+        titleBgm.volume = 1;
+        titleBgm.muted = false;
+        gameBgm.volume = 1;
+        gameBgm.muted = false;
+        gameBgmFadeGain.gain.value = 0;
+        audioGraphInitialized = true;
+
+        applyBgmVolume();
+        applySoundEffectsVolume();
+
+        if (audioContext.state === "suspended") {
+            audioContext.resume().catch(function () {});
+        }
+    } catch (error) {
+        console.log("Web Audio APIを初期化できませんでした:", error);
+        audioContext = null;
+        bgmMasterGain = null;
+        soundEffectsMasterGain = null;
+        gameBgmFadeGain = null;
+        audioGraphInitialized = false;
+    }
+}
+
 
 
 
 
 function applyBgmVolume() {
+    const actualVolume = bgmEnabled ? bgmVolume : 0;
 
-    titleBgm.volume = bgmVolume;
-
-    if (
-        gameBgm.paused ||
-        !gameStarted ||
-        isSolved
-    ) {
-        gameBgm.volume = 0;
+    if (audioGraphInitialized && bgmMasterGain) {
+        bgmMasterGain.gain.value = actualVolume;
+        titleBgm.volume = 1;
+        gameBgm.volume = 1;
+        return;
     }
 
+    titleBgm.volume = actualVolume;
+    if (gameBgm.paused || !gameStarted || isSolved) {
+        gameBgm.volume = 0;
+    } else {
+        gameBgm.volume = actualVolume;
+    }
 }
 
 
 function applySoundEffectsVolume() {
+    const actualVolume =
+        soundEffectsEnabled ? soundEffectsVolume : 0;
+
+    if (audioGraphInitialized && soundEffectsMasterGain) {
+        soundEffectsMasterGain.gain.value = actualVolume;
+        soundEffects.forEach(function (sound) {
+            sound.volume = 1;
+            sound.muted = false;
+        });
+        return;
+    }
 
     soundEffects.forEach(function (sound) {
-
-        sound.volume =
-            soundEffectsVolume;
-
+        sound.volume = actualVolume;
     });
-
 }
 
 
@@ -953,100 +1033,51 @@ function updateSoundButtons() {
 
 
 function changeBgmVolume(value) {
-
-    const volumeNumber =
-        Number(value);
-
-    bgmVolume =
-        volumeNumber / 100;
-
-    localStorage.setItem(
-        "bgmVolume",
-        volumeNumber
-    );
-
-    document.getElementById(
-        "bgm-volume-value"
-    ).textContent =
+    const volumeNumber = Number(value);
+    bgmVolume = volumeNumber / 100;
+    localStorage.setItem("bgmVolume", volumeNumber);
+    document.getElementById("bgm-volume-value").textContent =
         volumeNumber + "%";
-
-    titleBgm.volume =
-        bgmVolume;
-
-    if (
-        !gameBgm.paused &&
-        bgmEnabled
-    ) {
-        gameBgm.volume =
-            bgmVolume;
-    }
-
+    initializeAudioGraph();
+    applyBgmVolume();
 }
 
 
 function changeSoundEffectsVolume(value) {
-
-    const volumeNumber =
-        Number(value);
-
-    soundEffectsVolume =
-        volumeNumber / 100;
-
-    localStorage.setItem(
-        "soundEffectsVolume",
-        volumeNumber
-    );
-
-    document.getElementById(
-        "se-volume-value"
-    ).textContent =
+    const volumeNumber = Number(value);
+    soundEffectsVolume = volumeNumber / 100;
+    localStorage.setItem("soundEffectsVolume", volumeNumber);
+    document.getElementById("se-volume-value").textContent =
         volumeNumber + "%";
-
+    initializeAudioGraph();
     applySoundEffectsVolume();
-
 }
 
 
 
 function toggleBgm() {
-
+    initializeAudioGraph();
     bgmEnabled = !bgmEnabled;
-
-    localStorage.setItem(
-        "bgmEnabled",
-        bgmEnabled
-    );
-
-    titleBgm.muted = !bgmEnabled;
-    gameBgm.muted = !bgmEnabled;
+    localStorage.setItem("bgmEnabled", bgmEnabled);
+    applyBgmVolume();
 
     if (!bgmEnabled) {
         stopGameBgm();
+        titleBgm.pause();
     } else if (gameStarted && !isSolved) {
         startGameBgm();
     }
 
     updateSoundButtons();
-
 }
 
 
 function toggleSoundEffects() {
-
-    soundEffectsEnabled =
-        !soundEffectsEnabled;
-
-    localStorage.setItem(
-        "soundEffectsEnabled",
-        soundEffectsEnabled
-    );
-
-    soundEffects.forEach(function (sound) {
-        sound.muted = !soundEffectsEnabled;
-    });
-
+    initializeAudioGraph();
+    soundEffectsEnabled = !soundEffectsEnabled;
+    localStorage.setItem("soundEffectsEnabled", soundEffectsEnabled);
+    applySoundEffectsVolume();
     updateSoundButtons();
-
 }
 
 
@@ -2476,62 +2507,64 @@ let gameBgmFadeTimer = null;
 
 
 function startGameBgm() {
-
+    initializeAudioGraph();
     clearInterval(gameBgmFadeTimer);
-
     gameBgm.pause();
     gameBgm.currentTime = 0;
-    gameBgm.volume = 0;
 
-    if (
-        !bgmEnabled ||
-        bgmVolume === 0
-    ) {
+    if (!bgmEnabled || bgmVolume === 0) {
         return;
     }
 
-    gameBgm.play().catch(error => {
-        console.log(
-            "プレイBGMを再生できませんでした:",
-            error
-        );
+    applyBgmVolume();
+
+    if (audioGraphInitialized && gameBgmFadeGain) {
+        gameBgm.volume = 1;
+        gameBgmFadeGain.gain.value = 0;
+    } else {
+        gameBgm.volume = 0;
+    }
+
+    gameBgm.play().catch(function (error) {
+        console.log("プレイBGMを再生できませんでした:", error);
     });
 
     gameBgmFadeTimer = setInterval(function () {
-
-        const fadeStep =
-            Math.max(bgmVolume / 15, 0.001);
-
-        const nextVolume =
-            Math.min(
-                gameBgm.volume + fadeStep,
-                bgmVolume
+        if (audioGraphInitialized && gameBgmFadeGain) {
+            const nextGain = Math.min(
+                gameBgmFadeGain.gain.value + (1 / 15),
+                1
             );
-
-        gameBgm.volume =
-            nextVolume;
-
-        if (gameBgm.volume >= bgmVolume) {
-
-            clearInterval(
-                gameBgmFadeTimer
-            );
-
+            gameBgmFadeGain.gain.value = nextGain;
+            if (nextGain >= 1) {
+                clearInterval(gameBgmFadeTimer);
+            }
+            return;
         }
 
+        const fadeStep = Math.max(bgmVolume / 15, 0.001);
+        const nextVolume = Math.min(
+            gameBgm.volume + fadeStep,
+            bgmVolume
+        );
+        gameBgm.volume = nextVolume;
+        if (gameBgm.volume >= bgmVolume) {
+            clearInterval(gameBgmFadeTimer);
+        }
     }, 70);
-
 }
 
 
 function stopGameBgm() {
-
     clearInterval(gameBgmFadeTimer);
-
     gameBgm.pause();
     gameBgm.currentTime = 0;
-    gameBgm.volume = 0;
 
+    if (audioGraphInitialized && gameBgmFadeGain) {
+        gameBgmFadeGain.gain.value = 0;
+    } else {
+        gameBgm.volume = 0;
+    }
 }
 
 
@@ -2850,6 +2883,7 @@ function checkClear() {
 
 
 function startTitleBgm() {
+    initializeAudioGraph();
 
 
     if (
@@ -2932,6 +2966,7 @@ titleScreen.addEventListener(
 
 
 function startTitleGame(event) {
+    initializeAudioGraph();
 
     event.stopPropagation();
 
