@@ -66,9 +66,13 @@
 
         <img src="images/title.jpg" alt="タイトル画像" id="title-image">
 
-        <button class="start-button title-start-button" onclick="startTitleGame()">
+        <p id="title-bgm-guide">
+            🔊 画面をタップするとBGMが流れます
+        </p>
 
-            🎮 START!
+        <button class="start-button title-start-button" onclick="startTitleGame(event)">
+
+            START!
 
         </button>
 
@@ -87,20 +91,52 @@
 
         <div id="difficulty-container" class="difficulty-buttons">
 
-            <button id="diff-3" onclick="setDifficulty(3)">
-                😊 初級
+            <button id="diff-3" type="button" onclick="setDifficulty(3)">
+
+                <span class="difficulty-name">
+                    初級
+                </span>
+
+                <span class="difficulty-size">
+                    3 × 3
+                </span>
+
             </button>
 
-            <button id="diff-4" onclick="setDifficulty(4)">
-                😎 中級
+            <button id="diff-4" type="button" onclick="setDifficulty(4)">
+
+                <span class="difficulty-name">
+                    中級
+                </span>
+
+                <span class="difficulty-size">
+                    4 × 4
+                </span>
+
             </button>
 
-            <button id="diff-5" onclick="setDifficulty(5)">
-                🔥 上級
+            <button id="diff-5" type="button" onclick="setDifficulty(5)">
+
+                <span class="difficulty-name">
+                    上級
+                </span>
+
+                <span class="difficulty-size">
+                    5 × 5
+                </span>
+
             </button>
 
-            <button id="diff-6" onclick="setDifficulty(6)">
-                👹 超級
+            <button id="diff-6" type="button" onclick="setDifficulty(6)">
+
+                <span class="difficulty-name">
+                    超級
+                </span>
+
+                <span class="difficulty-size">
+                    6 × 6
+                </span>
+
             </button>
 
         </div>
@@ -112,11 +148,11 @@
             </button>
 
             <button id="start-button" class="start-button" onclick="shuffle()" disabled>
-                🎮 ゲーム開始
+                ▶ ゲーム開始
             </button>
 
             <button class="settings-button" onclick="toggleSettings()">
-                ⚙️
+                ⚙️ 設定
             </button>
 
         </div>
@@ -129,20 +165,28 @@
 
             <div class="info-panel">
 
+                <div class="info-panel-title">
+                    プレイ情報
+                </div>
+
                 <p id="moves">
                     🎯 移動回数: 0
                 </p>
 
                 <p id="timer">
-                    ⏰ 経過時間: 00:00
+                    ⏱ 経過時間: 00:00
                 </p>
 
             </div>
 
             <div class="record-panel">
 
+                <div class="info-panel-title">
+                    ベスト記録
+                </div>
+
                 <p id="best">
-                    🥇 最少移動回数: -
+                    🏅 最少移動回数: -
                 </p>
 
                 <p id="best-time">
@@ -162,6 +206,57 @@
                 <h2>
                     ⚙️ 設定
                 </h2>
+
+                <div class="sound-setting">
+
+                    <button id="bgm-toggle-button" type="button" onclick="toggleBgm()">
+
+                        🎵 BGM：ON
+
+                    </button>
+
+                    <div class="volume-control">
+
+                        <label for="bgm-volume">
+                            BGM音量
+                        </label>
+
+                        <input id="bgm-volume" type="range" min="0" max="100" step="1" value="15"
+                            oninput="changeBgmVolume(this.value)">
+
+                        <span id="bgm-volume-value">
+                            15%
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="sound-setting">
+
+                    <button id="se-toggle-button" type="button" onclick="toggleSoundEffects()">
+
+                        🔊 効果音：ON
+
+                    </button>
+
+                    <div class="volume-control">
+
+                        <label for="se-volume">
+                            効果音量
+                        </label>
+
+                        <input id="se-volume" type="range" min="0" max="100" step="1" value="70"
+                            oninput="changeSoundEffectsVolume(this.value)">
+
+                        <span id="se-volume-value">
+                            70%
+                        </span>
+
+                    </div>
+
+                </div>
 
                 <button onclick="resetBestScore()">
                     最少移動回数をリセット
@@ -194,83 +289,118 @@
 
         <div id="game"></div>
 
-<div class="utility-buttons">
+        <div class="utility-buttons">
 
-    <button
-        id="original-button"
-        onclick="toggleOriginal()">
+            <button id="original-button" type="button" onclick="toggleOriginal()">
 
-        🖼️ 完成図
+                🖼️ 完成図
 
-    </button>
-
-</div>
-
-
-<div id="original-container"
-     style="display: none;">
-
-    <div id="original-content">
-
-        <h2>
-            🖼️ 完成図
-        </h2>
-
-        <img
-            id="original-image"
-            src="images/cat.jpg"
-            alt="完成lick="closeOriginal()">
-
-            閉じる
-
-        </button>
-
-    </div>
-
-</div>
-
-
-<div id="message"></div>
-
-
-<div id="clear-panel"
-     style="display: none;">
-
-    <div id="clear-content">
-
-        <div id="clear-stats">
-
-            <span id="clear-moves"></span>
-
-            <span id="clear-time"></span>
-
-        </div>
-
-        <h2 id="clear-title">
-            🎉 CLEAR! 🎉
-        </h2>
-
-        <div id="clear-buttons">
-
-            <button onclick="closeClearPanel()">
-                OK
             </button>
 
-            <button onclick="playAgain()">
-                🎮 もう一回遊ぶ
+            <button id="number-hint-button" type="button" onclick="toggleNumberHint()">
+
+                🔢 番号ヒント：OFF
+
             </button>
 
         </div>
 
+
+        <div id="original-container" style="display: none;">
+
+            <div id="original-content">
+
+                <h2>
+                    🖼️ 完成図
+                </h2>
+
+                <img id="original-image" src="images/cat.jpg" inal-close-button">
+
+                閉じる
+
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <div id="message"></div>
+
+
+        <div id="clear-panel" style="display: none;">
+
+            <div id="clear-content">
+
+                <div id="clear-stats">
+
+                    <div class="clear-stat-card">
+
+                        <span class="clear-stat-label">
+                            🎯 移動回数
+                        </span>
+
+                        <span id="clear-moves" class="clear-stat-value">
+
+                            0回
+
+                        </span>
+
+                    </div>
+
+                    <div class="clear-stat-card">
+
+                        <span class="clear-stat-label">
+                            ⏱ クリア時間
+                        </span>
+
+                        <span id="clear-time" class="clear-stat-value">
+
+                            00:00
+
+                        </span>
+
+                    </div>
+
+                </div>
+
+                <h2 id="clear-title">
+
+                    <span class="clear-check">
+                        ✓
+                    </span>
+
+                    <span class="clear-title-text">
+                        CLEAR!
+                    </span>
+
+                </h2>
+
+                <div id="clear-buttons">
+
+                    <button type="button" class="clear-replay-button" onclick="playAgain()">
+
+                        ↻ もう一回遊ぶ
+
+                    </button>
+
+                    <button type="button" class="clear-ok-button" onclick="closeClearPanel()">
+
+                        OK
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
     </div>
 
-</div>
 
-
-</div>
-
-
-<script src="game.js"></script>
+    <script src="game.js"></script>
 
 </body>
 

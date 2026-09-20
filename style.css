@@ -1,5 +1,10 @@
 body {
 
+    margin: 0;
+    min-width: 0;
+    min-height: 100vh;
+    overflow-x: hidden;
+
     text-align: center;
 
     font-family:
@@ -17,13 +22,14 @@ body {
 
 
 
-
 #game-screen {
-
     display: none;
-
+    width: 100%;
+    min-height: 100vh;
+    padding: 14px 12px 24px;
+    box-sizing: border-box;
+    overflow-x: hidden;
 }
-
 
 
 
@@ -147,6 +153,9 @@ button:active {
     margin: 20px auto;
     display: grid;
     gap: 1px;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 
@@ -190,13 +199,32 @@ h1 {
 }
 
 
+
 .title-start-button {
-    font-size: 42px !important;
-    padding: 20px 60px !important;
+    min-width: 190px;
+
+    padding:
+        17px 48px !important;
+
+    font-family:
+        "M PLUS Rounded 1c",
+        sans-serif;
+
+    font-size:
+        38px !important;
+
     font-weight: 900;
-    letter-spacing: 2px;
+
+    line-height: 1;
+
+    letter-spacing: 4px;
+
+    color: #ffffff;
+
     text-shadow:
-        0 2px 4px rgba(0, 0, 0, 0.2);
+        0 2px 0 rgba(29, 112, 47, 0.75),
+
+        0 4px 8px rgba(0, 0, 0, 0.24);
 }
 
 
@@ -368,25 +396,61 @@ h1 {
 
 
 
-
+/* プレイ情報・ベスト記録カード */
 .info-panel,
 .record-panel {
-
     min-width: 170px;
-
-    padding: 15px;
+    padding: 12px 16px;
+    box-sizing: border-box;
 
     font-family:
         "M PLUS Rounded 1c",
         sans-serif;
 
+    color: #343c45;
+
+    background:
+        rgba(255, 255, 255, 0.82);
+
+    border:
+        1px solid rgba(255, 255, 255, 0.75);
+
+    border-radius: 18px;
+
+    box-shadow:
+        0 4px 12px rgba(0, 0, 0, 0.1);
+
+    backdrop-filter:
+        blur(7px);
+
+    -webkit-backdrop-filter:
+        blur(7px);
 }
 
+
+/* カードの見出し */
+.info-panel-title {
+    margin-bottom: 6px;
+
+    color: #6b747e;
+
+    font-size: 12px;
+    font-weight: 900;
+
+    letter-spacing: 0.8px;
+}
+
+
+/* カード内の数値 */
 .info-panel p,
 .record-panel p {
+    margin: 3px 0;
 
-    margin: 2px 0;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.4;
 
+    text-shadow: none;
 }
 
 
@@ -531,29 +595,46 @@ h1 {
 .tile {
     width: 80px;
     height: 80px;
-    border: 0.5px solid rgba(255, 255, 255, 0.3);
+
+    position: relative;
+
+    border:
+        1px solid rgba(255, 255, 255, 0.5);
+
     box-sizing: border-box;
+
     cursor: pointer;
 
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    -webkit-tap-highlight-color:
+        transparent;
+
+    box-shadow:
+        0 1px 3px rgba(0, 0, 0, 0.12);
 
     transition:
-        transform 0.3s ease,
-        box-shadow 0.3s ease;
+        filter 0.18s ease,
+        box-shadow 0.18s ease;
 }
 
-.tile:hover {
-    transform: scale(1.05);
-}
 
+
+.tile:hover,
 .tile:active {
-    transform: scale(0.95);
+    transform: none;
 }
+
 
 .movable {
-    box-shadow: 0 0 20px gold;
+    filter:
+        brightness(1.04);
 
-    animation: pulse 1s infinite;
+    box-shadow:
+        inset 0 0 0 2px rgba(76, 175, 80, 0.58),
+
+        0 2px 6px rgba(0, 0, 0, 0.15);
+
+    animation:
+        movableHint 1.4s ease-in-out infinite;
 }
 
 
@@ -577,25 +658,30 @@ h1 {
 
 
 
+@keyframes movableHint {
 
+    0%,
+    100% {
+        filter:
+            brightness(1.02);
 
-@keyframes pulse {
+        box-shadow:
+            inset 0 0 0 2px rgba(76, 175, 80, 0.42),
 
-    0% {
-        box-shadow: 0 0 5px gold;
+            0 1px 4px rgba(0, 0, 0, 0.13);
     }
 
     50% {
-        box-shadow: 0 0 20px gold;
+        filter:
+            brightness(1.07);
+
+        box-shadow:
+            inset 0 0 0 3px rgba(76, 175, 80, 0.78),
+
+            0 2px 7px rgba(0, 0, 0, 0.17);
     }
 
-    100% {
-        box-shadow: 0 0 5px gold;
-    }
 }
-
-
-
 
 
 
@@ -637,26 +723,104 @@ h1 {
 
 
 
-
+/* クリアタイトル全体 */
 #clear-title {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 
-    font-size: 72px;
+    gap: 6px;
+
+    margin: 18px 0 24px;
+
+    font-family:
+        "M PLUS Rounded 1c",
+        sans-serif;
 
     white-space: nowrap;
 
-    margin: 24px 0 36px;
+    animation:
+        clearTitleAppear 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
 
-    color: gold;
+
+/* 上部のチェックマーク */
+.clear-check {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 46px;
+    height: 46px;
+
+    color: white;
+
+    background:
+        linear-gradient(145deg,
+            #72dc82,
+            #35a94d);
+
+    border:
+        3px solid rgba(255, 255, 255, 0.9);
+
+    border-radius: 50%;
+
+    font-size: 28px;
+    font-weight: 900;
+    line-height: 1;
+
+    box-shadow:
+        0 5px 14px rgba(41, 145, 65, 0.34);
+}
+
+
+/* CLEAR文字 */
+.clear-title-text {
+    color: #ffffff;
+
+    font-size:
+        clamp(42px, 10vw, 66px);
+
+    font-weight: 900;
+    line-height: 1;
+
+    letter-spacing: 3px;
 
     text-shadow:
-        -3px -3px 0 #7a4f00,
-        3px -3px 0 #7a4f00,
-        -3px 3px 0 #7a4f00,
-        3px 3px 0 #7a4f00,
-        0 0 15px gold,
-        0 0 30px orange;
+        0 3px 0 #278c3c,
+        0 6px 14px rgba(0, 0, 0, 0.32);
+}
+
+
+
+/* CLEAR文字の登場アニメーション */
+@keyframes clearTitleAppear {
+
+    0% {
+        opacity: 0;
+
+        transform:
+            translateY(14px) scale(0.82);
+    }
+
+    65% {
+        opacity: 1;
+
+        transform:
+            translateY(-3px) scale(1.04);
+    }
+
+    100% {
+        opacity: 1;
+
+        transform:
+            translateY(0) scale(1);
+    }
 
 }
+
+
 
 
 
@@ -677,19 +841,102 @@ h1 {
 }
 
 
-#clear-stats {
 
-    display: flex;
+
+/* クリア結果の情報エリア */
+#clear-stats {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(120px, 160px));
 
     justify-content: center;
 
-    gap: 30px;
+    gap: 12px;
 
-    margin: 0 0 24px;
-
-    flex-wrap: wrap;
-
+    width: 100%;
+    margin: 0 auto 18px;
 }
+
+
+
+
+
+/* 移動回数・クリア時間のカード */
+.clear-stat-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 72px;
+    padding: 10px 12px;
+
+    box-sizing: border-box;
+
+    background:
+        rgba(255, 255, 255, 0.88);
+
+    border:
+        1px solid rgba(255, 255, 255, 0.72);
+
+    border-radius: 18px;
+
+    box-shadow:
+        0 5px 14px rgba(0, 0, 0, 0.18);
+
+    backdrop-filter:
+        blur(8px);
+
+    -webkit-backdrop-filter:
+        blur(8px);
+}
+
+
+/* 移動回数・時間の項目名 */
+.clear-stat-label {
+    display: block;
+
+    color: #66707a;
+
+    font-family:
+        "M PLUS Rounded 1c",
+        sans-serif;
+
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.2;
+
+    letter-spacing: 0.5px;
+
+    text-shadow: none;
+}
+
+
+/* 移動回数・時間の数値 */
+.clear-stat-value {
+    display: block;
+
+    margin-top: 5px;
+
+    color: #2f3740;
+
+    font-family:
+        "M PLUS Rounded 1c",
+        sans-serif;
+
+    font-size: 24px;
+    font-weight: 900;
+    line-height: 1;
+
+    letter-spacing: 1px;
+
+    text-shadow: none;
+}
+
+
+
+
 
 
 
@@ -731,6 +978,11 @@ h1 {
     overflow: hidden;
 
     touch-action: none;
+
+    opacity: 0;
+
+    transition:
+        opacity 0.4s ease;
 
 }
 
@@ -809,24 +1061,6 @@ h1 {
 
 
 
-
-#clear-moves,
-#clear-time {
-
-    color: white;
-
-    font-size: 28px;
-
-    font-weight: 900;
-
-    text-shadow:
-        -2px -2px 0 black,
-        2px -2px 0 black,
-        -2px 2px 0 black,
-        2px 2px 0 black,
-        0 0 10px rgba(255, 255, 255, 0.5);
-
-}
 
 
 
@@ -938,15 +1172,10 @@ h1 {
 
 
 .original-close-button {
-
     display: block;
-
     width: 100%;
-
     max-width: 480px;
-
     margin: 16px auto 0;
-
     padding: 14px 20px;
 
     font-family:
@@ -954,17 +1183,14 @@ h1 {
         sans-serif;
 
     font-size: 18px;
-
     font-weight: 900;
 
     color: #333333;
 
     background:
-        linear-gradient(
-            to bottom,
+        linear-gradient(to bottom,
             #ffffff,
-            #e5e5e5
-        );
+            #e5e5e5);
 
     border: 2px solid #cccccc;
 
@@ -993,11 +1219,9 @@ h1 {
     color: white;
 
     background:
-        linear-gradient(
-            to bottom,
+        linear-gradient(to bottom,
             #76e276,
-            #3fae3f
-        );
+            #3fae3f);
 
     transform:
         translateY(-2px);
@@ -1082,9 +1306,6 @@ h1 {
         margin-bottom: 6px;
     }
 
-    #difficulty-container button {
-        min-width: 80px;
-    }
 
 
     /* プレイ情報・ベスト記録 */
@@ -1100,10 +1321,30 @@ h1 {
 
     .info-panel,
     .record-panel {
+        width: auto;
         min-width: 0;
-        width: 44%;
-        padding: 2px 4px;
-        font-size: 14px;
+
+        padding: 9px 5px;
+
+        border-radius: 15px;
+
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    .info-panel-title {
+        margin-bottom: 4px;
+
+        font-size: 10px;
+    }
+
+    .info-panel p,
+    .record-panel p {
+        margin: 2px 0;
+
+        font-size: 11px;
+
+        white-space: nowrap;
     }
 
 
@@ -1132,9 +1373,17 @@ h1 {
     }
 
     .title-start-button {
-        font-size: 32px !important;
-        padding: 14px 44px !important;
-        margin-top: 12px;
+        min-width: 180px;
+
+        margin-top: 10px;
+
+        padding:
+            14px 36px !important;
+
+        font-size:
+            32px !important;
+
+        letter-spacing: 3px;
     }
 
 
@@ -1151,31 +1400,39 @@ h1 {
     }
 
     #clear-title {
-
-        font-size: 48px;
-
-        margin: 20px 0 28px;
-
-        white-space: nowrap;
-
+        gap: 5px;
+        margin: 14px 0 20px;
     }
+
 
     #clear-stats {
+        grid-template-columns:
+            repeat(2, minmax(105px, 1fr));
 
-        margin: 0 0 18px;
+        gap: 8px;
 
-        flex-direction: column;
-
-        gap: 5px;
-
+        width: 100%;
+        margin: 0 auto 14px;
     }
 
-    #clear-moves,
-    #clear-time {
+    .clear-stat-card {
+        min-height: 64px;
+        padding: 8px 6px;
 
-        font-size: 18px;
-
+        border-radius: 15px;
     }
+
+    .clear-stat-label {
+        font-size: 11px;
+    }
+
+    .clear-stat-value {
+        margin-top: 4px;
+
+        font-size: 21px;
+    }
+
+
 
     #clear-buttons {
 
@@ -1231,4 +1488,1151 @@ h1 {
     }
 
 
+}
+
+
+
+
+#title-screen {
+    opacity: 1;
+    transition: opacity 1s ease;
+}
+
+#title-screen.title-fade-out {
+    opacity: 0;
+    pointer-events: none;
+}
+
+
+
+.sound-setting {
+    width: 100%;
+    margin-bottom: 16px;
+}
+
+.sound-setting>button {
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.volume-control {
+    display: grid;
+    grid-template-columns: 80px 1fr 48px;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+}
+
+.volume-control label {
+    font-size: 14px;
+    font-weight: bold;
+    text-align: left;
+}
+
+.volume-control input[type="range"] {
+    width: 100%;
+    cursor: pointer;
+    accent-color: #ff9800;
+}
+
+.volume-control span {
+    min-width: 48px;
+    font-size: 14px;
+    font-weight: bold;
+    text-align: right;
+}
+
+
+
+
+
+
+
+
+/* メイン操作ボタンの位置を完全固定 */
+.main-actions {
+    position: relative;
+    display: block;
+    width: 460px;
+    max-width: calc(100% - 20px);
+    height: 48px;
+    margin: 8px auto 16px;
+}
+
+/* 中止ボタンは左側に固定 */
+.main-actions #cancel-button {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 120px;
+    height: 48px;
+    margin: 0;
+    white-space: nowrap;
+}
+
+/* ゲーム開始ボタンは常に中央 */
+.main-actions #start-button {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 180px;
+    height: 48px;
+    margin: 0;
+    transform: translateX(-50%);
+    white-space: nowrap;
+}
+
+/* 設定ボタンは右側に固定 */
+.main-actions .settings-button {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 120px;
+    height: 48px;
+    margin: 0;
+    white-space: nowrap;
+}
+
+
+
+
+/* クリア後は完成画像を一枚絵として表示 */
+#game.solved {
+    gap: 0;
+}
+
+#game.solved .tile {
+    pointer-events: none;
+    transform: none !important;
+    scale: 1 !important;
+    z-index: auto !important;
+    border: none !important;
+    box-shadow: none !important;
+    animation: none !important;
+    cursor: default;
+}
+
+#game.solved .tile:hover,
+#game.solved .tile:active {
+    transform: none !important;
+    scale: 1 !important;
+    z-index: auto !important;
+    border: none !important;
+    box-shadow: none !important;
+    filter: none !important;
+}
+
+
+/* クリア画面をゆっくり表示 */
+#clear-panel.show {
+    opacity: 1;
+}
+
+/* CLEARの内容は少し下から拡大して登場 */
+#clear-panel #clear-content {
+    opacity: 0;
+
+    transform:
+        translate(-50%, -46%) scale(0.92);
+
+    transition:
+        opacity 0.4s ease,
+        transform 0.4s ease;
+}
+
+#clear-panel.show #clear-content {
+    opacity: 1;
+
+    transform:
+        translate(-50%, -50%) scale(1);
+}
+
+
+
+
+
+/* 完成図と番号ヒントの操作エリア */
+.utility-buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin: 10px auto 18px;
+}
+
+
+/* ゲーム開始前は非表示 */
+#number-hint-button {
+    display: none;
+    min-width: 160px;
+}
+
+
+/* 番号ヒントONの表示 */
+#number-hint-button.hint-enabled {
+    color: white;
+
+    background:
+        linear-gradient(to bottom,
+            #ffb74d,
+            #f57c00);
+}
+
+
+
+
+
+
+
+
+/* タイル上の正解番号 */
+.tile {
+    position: relative;
+}
+
+
+/* 左上の番号バッジ */
+.tile-number {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    z-index: 5;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 24px;
+    height: 24px;
+    padding: 0 5px;
+    box-sizing: border-box;
+
+    color: white;
+    background:
+        rgba(0, 0, 0, 0.72);
+
+    border:
+        1px solid rgba(255, 255, 255, 0.8);
+
+    border-radius: 12px;
+
+    font-family:
+        "M PLUS Rounded 1c",
+        sans-serif;
+
+    font-size: 13px;
+    font-weight: 900;
+    line-height: 1;
+
+    text-shadow:
+        0 1px 2px black;
+
+    box-shadow:
+        0 2px 5px rgba(0, 0, 0, 0.3);
+
+    pointer-events: none;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+/* 上級・超級の小さいタイル用 */
+.tile-number.small {
+    top: 3px;
+    left: 3px;
+
+    min-width: 19px;
+    height: 19px;
+    padding: 0 3px;
+
+    border-radius: 10px;
+
+    font-size: 10px;
+}
+
+
+
+
+
+
+
+/* 難易度選択エリア */
+#difficulty-container {
+    display: grid;
+    grid-template-columns:
+        repeat(4, 112px);
+    justify-content: center;
+    gap: 12px;
+    margin: 16px auto 14px;
+    padding: 0 12px;
+    box-sizing: border-box;
+}
+
+
+/* 難易度カード */
+#difficulty-container button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    width: 112px;
+    height: 72px;
+    padding: 8px 10px;
+
+    border:
+        2px solid rgba(0, 0, 0, 0.08);
+
+    border-radius: 18px;
+
+    color: #3f4650;
+
+    background:
+        linear-gradient(145deg,
+            #ffffff,
+            #edf0f3);
+
+    box-shadow:
+        0 5px 12px rgba(0, 0, 0, 0.14);
+
+    font-family:
+        "M PLUS Rounded 1c",
+        sans-serif;
+
+    text-shadow: none;
+
+    transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease,
+        border-color 0.15s ease,
+        background 0.15s ease;
+}
+
+
+/* 難易度名 */
+.difficulty-name {
+    display: block;
+
+    font-size: 18px;
+    font-weight: 900;
+    line-height: 1.2;
+
+    letter-spacing: 1px;
+}
+
+
+/* 3×3などの盤面サイズ */
+.difficulty-size {
+    display: block;
+
+    margin-top: 5px;
+
+    color: #78818c;
+
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1;
+
+    letter-spacing: 1px;
+}
+
+
+/* マウスを乗せたとき */
+#difficulty-container button:hover {
+    transform:
+        translateY(-2px);
+
+    border-color:
+        rgba(76, 175, 80, 0.35);
+
+    box-shadow:
+        0 8px 16px rgba(0, 0, 0, 0.18);
+}
+
+
+/* 押した瞬間 */
+#difficulty-container button:active {
+    transform:
+        translateY(1px);
+
+    box-shadow:
+        0 3px 7px rgba(0, 0, 0, 0.16);
+}
+
+
+/* 選択中の難易度 */
+#difficulty-container button.selected-difficulty {
+    color: white;
+
+    border-color: #3f9e52;
+
+    background:
+        linear-gradient(145deg,
+            #69d77d,
+            #3fae58);
+
+    box-shadow:
+        0 6px 14px rgba(48, 140, 69, 0.32);
+}
+
+
+/* 選択中の盤面サイズ */
+#difficulty-container button.selected-difficulty .difficulty-size {
+    color:
+        rgba(255, 255, 255, 0.88);
+}
+
+
+/* ゲーム中の操作不可状態 */
+#difficulty-container button:disabled {
+    cursor: not-allowed;
+
+    opacity: 0.55;
+
+    filter:
+        grayscale(35%);
+
+    transform: none;
+}
+
+
+
+
+
+
+
+
+
+
+/* 狭い画面では難易度を2列にする */
+@media (max-width: 520px) {
+
+    #difficulty-container {
+        grid-template-columns:
+            repeat(2, minmax(120px, 150px));
+
+        gap: 10px;
+
+        margin:
+            12px auto 10px;
+    }
+
+    #difficulty-container button {
+        width: 100%;
+        height: 64px;
+    }
+
+    .difficulty-name {
+        font-size: 17px;
+    }
+
+    .difficulty-size {
+        margin-top: 4px;
+        font-size: 12px;
+    }
+
+}
+
+
+
+
+
+
+
+
+
+/* ========================================
+   スマホ表示の最終調整
+======================================== */
+
+@media (max-width: 768px) {
+
+    body {
+        width: 100%;
+        min-width: 0;
+        overflow-x: hidden;
+    }
+
+    #game-screen {
+        padding:
+            max(10px, env(safe-area-inset-top)) 10px max(20px, env(safe-area-inset-bottom));
+    }
+
+
+    /* 難易度カード */
+    #difficulty-container {
+        grid-template-columns:
+            repeat(2, minmax(120px, 160px));
+
+        justify-content: center;
+        gap: 9px;
+
+        width: 100%;
+        margin: 2px auto 12px;
+        padding: 0;
+    }
+
+    #difficulty-container button {
+        width: 100%;
+        height: 62px;
+        padding: 7px 8px;
+        border-radius: 16px;
+    }
+
+    .difficulty-name {
+        font-size: 17px;
+    }
+
+    .difficulty-size {
+        margin-top: 4px;
+        font-size: 12px;
+    }
+
+
+    /* 中止・ゲーム開始・設定 */
+    .main-actions {
+        position: relative;
+        display: block;
+
+        width: 100%;
+        max-width: 420px;
+        height: 46px;
+
+        margin: 0 auto 12px;
+    }
+
+    .main-actions #cancel-button {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: auto;
+
+        width: 76px;
+        height: 46px;
+        padding: 0 8px;
+
+        font-size: 13px;
+        letter-spacing: 0;
+        white-space: nowrap;
+    }
+
+    .main-actions #start-button {
+        position: absolute;
+        top: 0;
+        left: 50%;
+
+        width: 140px;
+        height: 46px;
+        padding: 0 10px;
+        margin: 0;
+
+        font-size: 15px;
+        letter-spacing: 0;
+
+        transform:
+            translateX(-50%);
+
+        white-space: nowrap;
+    }
+
+    .main-actions .settings-button {
+        position: absolute;
+        top: 0;
+        right: 0;
+        left: auto;
+
+        width: 76px;
+        height: 46px;
+        padding: 0 6px;
+
+        font-size: 13px;
+        white-space: nowrap;
+    }
+
+
+    /* プレイ情報・記録 */
+    .info-container {
+        display: grid;
+        grid-template-columns:
+            minmax(0, 1fr) minmax(0, 1fr);
+
+        align-items: stretch;
+        gap: 8px;
+
+        width: 100%;
+        max-width: 480px;
+
+        margin: 0 auto 10px;
+    }
+
+    .info-panel,
+    .record-panel {
+        width: auto;
+        min-width: 0;
+
+        padding: 9px 5px;
+
+        border-radius: 15px;
+
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    .info-panel-title {
+        margin-bottom: 4px;
+
+        font-size: 10px;
+    }
+
+    .info-panel p,
+    .record-panel p {
+        margin: 1px 0;
+
+        font-size: 11px;
+
+        white-space: nowrap;
+    }
+
+
+    /* パズル盤面 */
+    #game {
+        max-width: 100%;
+        margin: 8px auto 10px;
+
+        touch-action: none;
+
+        user-select: none;
+        -webkit-user-select: none;
+    }
+
+    .tile {
+        -webkit-tap-highlight-color:
+            transparent;
+
+        touch-action: none;
+
+        user-select: none;
+        -webkit-user-select: none;
+    }
+
+
+    /* 完成図・番号ヒント */
+    .utility-buttons {
+        display: grid;
+        grid-template-columns:
+            minmax(0, 1fr) minmax(0, 1fr);
+
+        gap: 8px;
+
+        width: 100%;
+        max-width: 420px;
+
+        margin: 8px auto 14px;
+    }
+
+    .utility-buttons button {
+        width: 100%;
+        min-width: 0;
+        min-height: 44px;
+        padding: 9px 6px;
+
+        font-size: 13px;
+        white-space: nowrap;
+    }
+
+    #number-hint-button {
+        min-width: 0;
+    }
+
+
+    /* 設定画面 */
+    #settings-menu {
+        box-sizing: border-box;
+
+        padding:
+            max(12px, env(safe-area-inset-top)) 12px max(12px, env(safe-area-inset-bottom));
+    }
+
+    #settings-content {
+        width: 100%;
+        max-width: 480px;
+        max-height: 92svh;
+
+        padding: 18px 16px;
+
+        border-radius: 20px;
+
+        overflow-y: auto;
+        overscroll-behavior: contain;
+    }
+
+    #settings-content h2 {
+        margin-bottom: 14px;
+        font-size: 22px;
+    }
+
+    #settings-content button {
+        min-height: 44px;
+        margin-top: 9px;
+        padding: 10px 8px;
+        font-size: 14px;
+    }
+
+    .sound-setting {
+        margin-bottom: 12px;
+    }
+
+    .volume-control {
+        grid-template-columns:
+            72px minmax(0, 1fr) 42px;
+
+        gap: 7px;
+    }
+
+    .volume-control label,
+    .volume-control span {
+        font-size: 12px;
+    }
+
+    .volume-control input[type="range"] {
+        min-width: 0;
+        height: 28px;
+    }
+
+
+    /* 完成図モーダル */
+    #original-container {
+        box-sizing: border-box;
+
+        padding:
+            max(12px, env(safe-area-inset-top)) 12px max(12px, env(safe-area-inset-bottom));
+    }
+
+    #original-content {
+        width: 100%;
+        max-width: 520px;
+        max-height: 90svh;
+
+        padding: 14px;
+
+        transform: none;
+
+        overflow-y: auto;
+    }
+
+    #original-content h2 {
+        margin-bottom: 10px;
+        font-size: 22px;
+    }
+
+    #original-image {
+        width: 100%;
+        max-width: 100%;
+        max-height: 66svh;
+        box-sizing: border-box;
+    }
+
+    .original-close-button {
+        min-height: 44px;
+        margin-top: 10px;
+        padding: 10px 12px;
+        font-size: 15px;
+    }
+
+
+    /* クリア画面 */
+    #clear-panel {
+        box-sizing: border-box;
+
+        padding:
+            max(12px, env(safe-area-inset-top)) 12px max(12px, env(safe-area-inset-bottom));
+    }
+
+    #clear-content {
+        width:
+            calc(100% - 24px);
+
+        max-width: 520px;
+        max-height: 90svh;
+
+        overflow-y: auto;
+    }
+
+    .clear-title-text {
+        font-size:
+            clamp(42px, 10vw, 66px);
+    }
+
+
+    #clear-moves,
+    #clear-time {
+        font-size: 17px;
+    }
+
+    #clear-buttons {
+        display: grid;
+        grid-template-columns:
+            1fr 1fr;
+
+        gap: 8px;
+        margin-top: 14px;
+    }
+
+    #clear-buttons button {
+        width: 100%;
+        min-height: 44px;
+        padding: 9px 8px;
+        font-size: 13px;
+    }
+
+
+    /* タイトル画面 */
+    #title-screen {
+        min-height: 100svh;
+
+        margin: 0;
+        padding:
+            max(12px, env(safe-area-inset-top)) 12px max(18px, env(safe-area-inset-bottom));
+
+        box-sizing: border-box;
+    }
+
+    #title-image {
+        display: block;
+
+        width: 100%;
+        max-width: 620px;
+        max-height:
+            calc(100svh - 120px);
+
+        margin: 0 auto;
+
+        object-fit: contain;
+        border-radius: 18px;
+    }
+
+    .title-start-button {
+        min-width: 180px;
+
+        margin-top: 10px;
+
+        padding:
+            14px 36px !important;
+
+        font-size:
+            32px !important;
+
+        letter-spacing: 3px;
+    }
+
+}
+
+
+
+
+
+
+
+/* タッチ端末ではホバー変形を残さない */
+@media (hover: none) {
+
+    button:hover {
+        transform: none;
+    }
+
+    .tile:hover {
+        transform: none;
+    }
+
+    #difficulty-container button:hover {
+        transform: none;
+    }
+
+}
+
+
+
+
+
+
+/* 小型スマホ向け */
+@media (max-width: 360px) {
+
+    #difficulty-container {
+        grid-template-columns:
+            repeat(2, minmax(105px, 1fr));
+
+        gap: 7px;
+    }
+
+    #difficulty-container button {
+        height: 58px;
+    }
+
+    .difficulty-name {
+        font-size: 16px;
+    }
+
+    .main-actions #cancel-button {
+        width: 70px;
+        font-size: 12px;
+    }
+
+    .main-actions #start-button {
+        width: 132px;
+        font-size: 14px;
+    }
+
+    .main-actions .settings-button {
+        width: 70px;
+        font-size: 12px;
+    }
+
+    .info-panel,
+    .record-panel {
+        padding: 7px 3px;
+        font-size: 11px;
+    }
+
+    .utility-buttons button {
+        font-size: 12px;
+    }
+
+    #clear-buttons {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+
+
+
+
+/* タイトル画面のBGM案内 */
+#title-bgm-guide {
+    width: fit-content;
+    margin: 10px auto 0;
+    padding: 7px 14px;
+
+    color: #5f6670;
+    background:
+        rgba(255, 255, 255, 0.78);
+
+    border:
+        1px solid rgba(0, 0, 0, 0.08);
+
+    border-radius: 18px;
+
+    font-family:
+        "M PLUS Rounded 1c",
+        sans-serif;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    box-shadow:
+        0 3px 8px rgba(0, 0, 0, 0.1);
+
+    opacity: 1;
+    visibility: visible;
+
+    transition:
+        opacity 0.4s ease,
+        visibility 0.4s ease;
+}
+
+
+/* BGM再生後は案内を消す */
+#title-bgm-guide.hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+
+
+
+
+/* スマホ用のBGM案内 */
+@media (max-width: 768px) {
+
+    #title-bgm-guide {
+        margin-top: 8px;
+        padding: 6px 12px;
+
+        font-size: 12px;
+    }
+
+}
+
+
+
+
+
+
+
+
+
+
+
+/* スライド移動中のタイル */
+.tile[style*="z-index: 10"] {
+    pointer-events: none;
+    box-shadow:
+        0 6px 14px rgba(0, 0, 0, 0.28);
+}
+
+
+
+
+
+/* スマホ用のCLEAR文字 */
+@media (max-width: 768px) {
+
+    .clear-check {
+        width: 40px;
+        height: 40px;
+
+        border-width: 2px;
+
+        font-size: 24px;
+    }
+
+    .clear-title-text {
+        font-size:
+            clamp(38px, 13vw, 54px);
+
+        letter-spacing: 2px;
+    }
+
+}
+
+
+
+
+/* 小型スマホ用のリザルト情報 */
+@media (max-width: 360px) {
+
+    #clear-stats {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+        gap: 7px;
+    }
+
+    .clear-stat-card {
+        min-height: 60px;
+        padding: 7px 4px;
+    }
+
+    .clear-stat-label {
+        font-size: 10px;
+    }
+
+    .clear-stat-value {
+        font-size: 19px;
+    }
+
+}
+
+
+
+
+
+/* リザルト画面の主ボタン */
+#clear-buttons .clear-replay-button {
+    color: white;
+
+    background:
+        linear-gradient(145deg,
+            #69d77d,
+            #3fae58);
+
+    border:
+        1px solid rgba(47, 142, 67, 0.75);
+
+    box-shadow:
+        0 5px 12px rgba(48, 140, 69, 0.3);
+
+    font-family:
+        "M PLUS Rounded 1c",
+        sans-serif;
+
+    font-weight: 900;
+
+    text-shadow:
+        0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+
+/* もう一回遊ぶにマウスを乗せたとき */
+#clear-buttons .clear-replay-button:hover {
+    background:
+        linear-gradient(145deg,
+            #78e28a,
+            #42b85d);
+
+    box-shadow:
+        0 7px 15px rgba(48, 140, 69, 0.36);
+}
+
+
+/* もう一回遊ぶを押したとき */
+#clear-buttons .clear-replay-button:active {
+    background:
+        linear-gradient(145deg,
+            #50bd67,
+            #329b48);
+
+    box-shadow:
+        0 2px 6px rgba(48, 140, 69, 0.26);
+}
+
+
+
+
+
+
+
+
+/* リザルト画面の副ボタン */
+#clear-buttons .clear-ok-button {
+    color: #4d5660;
+
+    background:
+        rgba(255, 255, 255, 0.9);
+
+    border:
+        1px solid rgba(0, 0, 0, 0.1);
+
+    box-shadow:
+        0 3px 8px rgba(0, 0, 0, 0.14);
+
+    font-family:
+        "M PLUS Rounded 1c",
+        sans-serif;
+
+    font-weight: 700;
+
+    text-shadow: none;
+}
+
+
+/* OKにマウスを乗せたとき */
+#clear-buttons .clear-ok-button:hover {
+    color: #273039;
+
+    background:
+        rgba(255, 255, 255, 1);
+
+    box-shadow:
+        0 5px 11px rgba(0, 0, 0, 0.18);
 }

@@ -12,7 +12,8 @@ const bestTimeText =
 
 
 
-
+const titleStartSound =
+    new Audio("sounds/title_start.mp3");
 
 const moveSound = new Audio("sounds/move.mp3");
 
@@ -21,14 +22,27 @@ const clearSound = new Audio("sounds/clear_fanfare.mp3");
 const selectSound =
     new Audio("sounds/select_difficulty.mp3");
 
+const cancelSound =
+    new Audio("sounds/cancel.mp3");
+
 const titleBgm =
     new Audio("BGM/title.mp3");
 
 titleBgm.loop = true;
 
+const gameBgm =
+    new Audio("BGM/game_bgm.mp3");
 
+gameBgm.loop = true;
+gameBgm.volume = 0;
 
+const titleScreen =
+    document.getElementById("title-screen");
 
+const titleBgmGuide =
+    document.getElementById(
+        "title-bgm-guide"
+    );
 
 
 
@@ -63,6 +77,206 @@ const settingsMenu =
     document.getElementById(
         "settings-menu"
     );
+
+
+
+
+
+
+
+let bgmEnabled =
+    localStorage.getItem("bgmEnabled") !== "false";
+
+let soundEffectsEnabled =
+    localStorage.getItem("soundEffectsEnabled") !== "false";
+
+let bgmVolume =
+    Number(
+        localStorage.getItem("bgmVolume") ?? 15
+    ) / 100;
+
+let soundEffectsVolume =
+    Number(
+        localStorage.getItem("soundEffectsVolume") ?? 70
+    ) / 100;
+
+
+
+const soundEffects = [
+    moveSound,
+    clearSound,
+    selectSound,
+    buttonSound,
+    titleStartSound,
+    cancelSound
+];
+
+
+
+
+
+function applyBgmVolume() {
+
+    titleBgm.volume = bgmVolume;
+
+    if (
+        gameBgm.paused ||
+        !gameStarted ||
+        isSolved
+    ) {
+        gameBgm.volume = 0;
+    }
+
+}
+
+
+function applySoundEffectsVolume() {
+
+    soundEffects.forEach(function (sound) {
+
+        sound.volume =
+            soundEffectsVolume;
+
+    });
+
+}
+
+
+
+
+
+function updateSoundButtons() {
+
+    const bgmButton =
+        document.getElementById(
+            "bgm-toggle-button"
+        );
+
+    const seButton =
+        document.getElementById(
+            "se-toggle-button"
+        );
+
+    if (bgmButton) {
+
+        bgmButton.textContent =
+            bgmEnabled
+                ? "🎵 BGM：ON"
+                : "🔇 BGM：OFF";
+
+    }
+
+    if (seButton) {
+
+        seButton.textContent =
+            soundEffectsEnabled
+                ? "🔊 効果音：ON"
+                : "🔇 効果音：OFF";
+
+    }
+
+}
+
+
+
+
+function changeBgmVolume(value) {
+
+    const volumeNumber =
+        Number(value);
+
+    bgmVolume =
+        volumeNumber / 100;
+
+    localStorage.setItem(
+        "bgmVolume",
+        volumeNumber
+    );
+
+    document.getElementById(
+        "bgm-volume-value"
+    ).textContent =
+        volumeNumber + "%";
+
+    titleBgm.volume =
+        bgmVolume;
+
+    if (
+        !gameBgm.paused &&
+        bgmEnabled
+    ) {
+        gameBgm.volume =
+            bgmVolume;
+    }
+
+}
+
+
+function changeSoundEffectsVolume(value) {
+
+    const volumeNumber =
+        Number(value);
+
+    soundEffectsVolume =
+        volumeNumber / 100;
+
+    localStorage.setItem(
+        "soundEffectsVolume",
+        volumeNumber
+    );
+
+    document.getElementById(
+        "se-volume-value"
+    ).textContent =
+        volumeNumber + "%";
+
+    applySoundEffectsVolume();
+
+}
+
+
+
+function toggleBgm() {
+
+    bgmEnabled = !bgmEnabled;
+
+    localStorage.setItem(
+        "bgmEnabled",
+        bgmEnabled
+    );
+
+    titleBgm.muted = !bgmEnabled;
+    gameBgm.muted = !bgmEnabled;
+
+    if (!bgmEnabled) {
+        stopGameBgm();
+    } else if (gameStarted && !isSolved) {
+        startGameBgm();
+    }
+
+    updateSoundButtons();
+
+}
+
+
+function toggleSoundEffects() {
+
+    soundEffectsEnabled =
+        !soundEffectsEnabled;
+
+    localStorage.setItem(
+        "soundEffectsEnabled",
+        soundEffectsEnabled
+    );
+
+    soundEffects.forEach(function (sound) {
+        sound.muted = !soundEffectsEnabled;
+    });
+
+    updateSoundButtons();
+
+}
+
 
 
 
@@ -193,7 +407,17 @@ function resetAllRecords() {
         )
     ) {
 
-        localStorage.clear();
+        [3, 4, 5, 6].forEach(function (size) {
+
+            localStorage.removeItem(
+                "bestScore_" + size
+            );
+
+            localStorage.removeItem(
+                "bestTime_" + size
+            );
+
+        });
 
         updateBestDisplay();
 
@@ -209,6 +433,8 @@ function closeClearPanel() {
     buttonSound.currentTime = 0;
     buttonSound.play();
 
+    clearPanel.classList.remove("show");
+
     clearPanel.style.display = "none";
 
     document.body.style.overflow = "";
@@ -222,6 +448,8 @@ function closeClearPanel() {
 
 
 function playAgain() {
+
+    clearPanel.classList.remove("show");
 
     clearPanel.style.display = "none";
 
@@ -264,7 +492,55 @@ const originalButton =
         "original-button"
     );
 
+const numberHintButton =
+    document.getElementById(
+        "number-hint-button"
+    );
 
+
+
+
+
+
+function updateNumberHintButton() {
+
+    if (!numberHintButton) {
+        return;
+    }
+
+    numberHintButton.textContent =
+        numberHintEnabled
+            ? "🔢 番号ヒント：ON"
+            : "🔢 番号ヒント：OFF";
+
+    numberHintButton.classList.toggle(
+        "hint-enabled",
+        numberHintEnabled
+    );
+
+}
+
+
+function toggleNumberHint() {
+
+    buttonSound.currentTime = 0;
+    buttonSound.play();
+
+    if (
+        !gameStarted ||
+        isSolved
+    ) {
+        return;
+    }
+
+    numberHintEnabled =
+        !numberHintEnabled;
+
+    updateNumberHintButton();
+
+    draw();
+
+}
 
 
 
@@ -297,6 +573,16 @@ function closeOriginal() {
         "";
 
 }
+
+
+originalContainer.addEventListener(
+    "click",
+    function () {
+
+        closeOriginal();
+
+    }
+);
 
 
 
@@ -417,21 +703,44 @@ let timer = null;
 let currentImage = "cat.jpg";
 
 const imageList = [
-    "cat.jpg",
-    "dog.jpg",
+    "amusement_park.jpg",
+    "balloon.jpg",
+    "bird.jpg",
+    "butterflies.jpg",
     "car.jpg",
+    "castle_japan.jpg",
     "castle.jpg",
-    "cloud.jpg"
+    "cat.jpg",
+    "cloud.jpg",
+    "dog.jpg",
+    "fish.jpg",
+    "fruit_tart.jpg",
+    "library.jpg",
+    "ship.jpg",
+    "ship.jpg",
+    "toy_room.jpg",
+    "train.jpg",
+    "vegetables.jpg",
+    "winter_cabin.jpg",
+
+
 ];
 
 
 
+let BOARD_SIZE_PX =
+    calculateBoardSize();
 
-const BOARD_SIZE_PX =
-    Math.min(
-        window.innerWidth * 0.90,
+
+function calculateBoardSize() {
+
+    return Math.min(
+        window.innerWidth - 24,
         480
     );
+
+}
+
 
 
 
@@ -454,7 +763,9 @@ let moves = 0;
 
 let isSolved = false;
 
+let numberHintEnabled = false;
 
+let isTileAnimating = false;
 
 
 
@@ -470,6 +781,11 @@ let isSolved = false;
 
 function draw() {
 
+    game.classList.toggle(
+        "solved",
+        isSolved
+    );
+
     const tileSize =
         BOARD_SIZE_PX / boardSize;
 
@@ -481,11 +797,39 @@ function draw() {
     game.innerHTML = "";
 
     numbers.forEach((num, index) => {
+
         const tile = document.createElement("div");
 
         tile.className = "tile";
 
+        if (
+            numberHintEnabled &&
+            num !== null &&
+            !isSolved
+        ) {
 
+            const numberBadge =
+                document.createElement("span");
+
+            numberBadge.className =
+                "tile-number";
+
+            numberBadge.textContent =
+                num;
+
+            if (boardSize >= 5) {
+
+                numberBadge.classList.add(
+                    "small"
+                );
+
+            }
+
+            tile.appendChild(
+                numberBadge
+            );
+
+        }
 
         tile.style.width =
             `${tileSize}px`;
@@ -572,13 +916,195 @@ function draw() {
 
         if (!isSolved) {
 
-            tile.addEventListener("click", () => {
+            let pointerStartX = 0;
+            let pointerStartY = 0;
+            let activePointerId = null;
 
-                moveTile(index);
 
-            });
+            tile.addEventListener(
+                "pointerdown",
+                function (event) {
+
+                    if (
+                        !gameStarted ||
+                        isSolved ||
+                        isTileAnimating
+                    ) {
+                        return;
+                    }
+
+                    pointerStartX =
+                        event.clientX;
+
+                    pointerStartY =
+                        event.clientY;
+
+                    activePointerId =
+                        event.pointerId;
+
+                    tile.setPointerCapture(
+                        event.pointerId
+                    );
+
+                }
+            );
+
+
+            tile.addEventListener(
+                "pointerup",
+                function (event) {
+
+                    if (
+                        activePointerId === null ||
+                        event.pointerId !==
+                        activePointerId
+                    ) {
+                        return;
+                    }
+
+                    const moveX =
+                        event.clientX -
+                        pointerStartX;
+
+                    const moveY =
+                        event.clientY -
+                        pointerStartY;
+
+                    activePointerId = null;
+
+                    if (
+                        tile.hasPointerCapture(
+                            event.pointerId
+                        )
+                    ) {
+
+                        tile.releasePointerCapture(
+                            event.pointerId
+                        );
+
+                    }
+
+                    const flickDistance = 24;
+
+                    const isTap =
+                        Math.abs(moveX)
+                        < flickDistance &&
+                        Math.abs(moveY)
+                        < flickDistance;
+
+                    if (isTap) {
+
+                        moveTile(index);
+
+                        return;
+
+                    }
+
+                    const emptyIndex =
+                        numbers.indexOf(null);
+
+                    const validMoves =
+                        getValidMoves(
+                            emptyIndex
+                        );
+
+                    if (
+                        !validMoves.includes(index)
+                    ) {
+                        return;
+                    }
+
+                    const tileRow =
+                        Math.floor(
+                            index / boardSize
+                        );
+
+                    const tileCol =
+                        index % boardSize;
+
+                    const emptyRow =
+                        Math.floor(
+                            emptyIndex / boardSize
+                        );
+
+                    const emptyCol =
+                        emptyIndex % boardSize;
+
+                    let flickDirection = "";
+
+                    if (
+                        Math.abs(moveX) >
+                        Math.abs(moveY)
+                    ) {
+
+                        flickDirection =
+                            moveX > 0
+                                ? "right"
+                                : "left";
+
+                    } else {
+
+                        flickDirection =
+                            moveY > 0
+                                ? "down"
+                                : "up";
+
+                    }
+
+                    let requiredDirection = "";
+
+                    if (emptyCol > tileCol) {
+
+                        requiredDirection =
+                            "right";
+
+                    } else if (
+                        emptyCol < tileCol
+                    ) {
+
+                        requiredDirection =
+                            "left";
+
+                    } else if (
+                        emptyRow > tileRow
+                    ) {
+
+                        requiredDirection =
+                            "down";
+
+                    } else if (
+                        emptyRow < tileRow
+                    ) {
+
+                        requiredDirection =
+                            "up";
+
+                    }
+
+                    if (
+                        flickDirection ===
+                        requiredDirection
+                    ) {
+
+                        moveTile(index);
+
+                    }
+
+                }
+            );
+
+
+            tile.addEventListener(
+                "pointercancel",
+                function () {
+
+                    activePointerId = null;
+
+                }
+            );
 
         }
+
         game.appendChild(tile);
     });
 }
@@ -624,34 +1150,119 @@ function getValidMoves(emptyIndex) {
 
 function moveTile(index) {
 
-    if (!gameStarted || isSolved) {
+    if (
+        !gameStarted ||
+        isSolved ||
+        isTileAnimating
+    ) {
         return;
     }
 
-    const emptyIndex = numbers.indexOf(null);
+    const emptyIndex =
+        numbers.indexOf(null);
 
     const validMoves =
         getValidMoves(emptyIndex);
 
-    if (validMoves.includes(index)) {
-
-        numbers[emptyIndex] = numbers[index];
-        numbers[index] = null;
-
-        moves++;
-
-        moveSound.currentTime = 0;
-        moveSound.play();
-
-        movesText.textContent = "🎯 移動回数: " + moves;
-
-
-
-        checkClear();
-        draw();
+    if (!validMoves.includes(index)) {
+        return;
     }
-}
 
+    const tile =
+        game.children[index];
+
+    if (!tile) {
+        return;
+    }
+
+    isTileAnimating = true;
+
+    const tileSize =
+        BOARD_SIZE_PX / boardSize;
+
+    const tileRow =
+        Math.floor(index / boardSize);
+
+    const tileCol =
+        index % boardSize;
+
+    const emptyRow =
+        Math.floor(emptyIndex / boardSize);
+
+    const emptyCol =
+        emptyIndex % boardSize;
+
+    const moveX =
+        (emptyCol - tileCol)
+        * tileSize;
+
+    const moveY =
+        (emptyRow - tileRow)
+        * tileSize;
+
+    moveSound.currentTime = 0;
+
+    moveSound.play().catch(function () {
+        /*
+         * 効果音を再生できない場合でも
+         * タイル移動は続ける
+         */
+    });
+
+    tile.style.zIndex = "10";
+
+    const slideAnimation =
+        tile.animate(
+            [
+                {
+                    transform:
+                        "translate(0px, 0px)"
+                },
+                {
+                    transform:
+                        `translate(${moveX}px, ${moveY}px)`
+                }
+            ],
+            {
+                duration: 200,
+
+                easing:
+                    "cubic-bezier(0.22, 0.61, 0.36, 1)",
+
+                fill: "forwards"
+            }
+        );
+
+    slideAnimation.finished
+        .then(function () {
+
+            numbers[emptyIndex] =
+                numbers[index];
+
+            numbers[index] =
+                null;
+
+            moves++;
+
+            movesText.textContent =
+                "🎯 移動回数: " + moves;
+
+            isTileAnimating = false;
+
+            draw();
+
+            checkClear();
+
+        })
+        .catch(function () {
+
+            isTileAnimating = false;
+
+            draw();
+
+        });
+
+}
 
 
 
@@ -662,6 +1273,8 @@ function setDifficulty(size) {
     selectSound.currentTime = 0;
     selectSound.play();
 
+    clearPanel.classList.remove("show");
+
     document.getElementById(
         "clear-panel"
     ).style.display = "none";
@@ -669,6 +1282,13 @@ function setDifficulty(size) {
     document.body.style.overflow = "";
 
     gameStarted = false;
+
+    numberHintEnabled = false;
+
+    updateNumberHintButton();
+
+    numberHintButton.style.display =
+        "none";
 
     isSolved = false;
 
@@ -718,9 +1338,27 @@ function setDifficulty(size) {
 
 function cancelGame() {
 
+
+    cancelSound.currentTime = 0;
+
+    cancelSound.play().catch(error => {
+        console.log(
+            "キャンセル音を再生できませんでした:",
+            error
+        );
+    });
+
+
+    stopGameBgm();
+
     gameStarted = false;
 
+    numberHintEnabled = false;
 
+    updateNumberHintButton();
+
+    numberHintButton.style.display =
+        "none";
 
     document.getElementById(
         "start-button"
@@ -815,6 +1453,70 @@ function updateDifficultyButtons() {
 
 
 
+let gameBgmFadeTimer = null;
+
+
+function startGameBgm() {
+
+    clearInterval(gameBgmFadeTimer);
+
+    gameBgm.pause();
+    gameBgm.currentTime = 0;
+    gameBgm.volume = 0;
+
+    if (
+        !bgmEnabled ||
+        bgmVolume === 0
+    ) {
+        return;
+    }
+
+    gameBgm.play().catch(error => {
+        console.log(
+            "プレイBGMを再生できませんでした:",
+            error
+        );
+    });
+
+    gameBgmFadeTimer = setInterval(function () {
+
+        const fadeStep =
+            Math.max(bgmVolume / 15, 0.001);
+
+        const nextVolume =
+            Math.min(
+                gameBgm.volume + fadeStep,
+                bgmVolume
+            );
+
+        gameBgm.volume =
+            nextVolume;
+
+        if (gameBgm.volume >= bgmVolume) {
+
+            clearInterval(
+                gameBgmFadeTimer
+            );
+
+        }
+
+    }, 70);
+
+}
+
+
+function stopGameBgm() {
+
+    clearInterval(gameBgmFadeTimer);
+
+    gameBgm.pause();
+    gameBgm.currentTime = 0;
+    gameBgm.volume = 0;
+
+}
+
+
+
 
 
 
@@ -828,7 +1530,11 @@ function shuffle() {
 
     gameStarted = true;
 
+    numberHintEnabled = false;
 
+    updateNumberHintButton();
+
+    startGameBgm();
 
     document.getElementById(
         "start-button"
@@ -880,7 +1586,8 @@ function shuffle() {
         "original-button"
     ).style.display = "inline-block";
 
-
+    numberHintButton.style.display =
+        "inline-block";
 
     draw();
 
@@ -912,6 +1619,10 @@ function updateTimer() {
 
 function checkClear() {
 
+    if (isSolved) {
+        return;
+    }
+
     const clearPattern = [];
 
     for (let i = 1; i < boardSize * boardSize; i++) {
@@ -935,11 +1646,31 @@ function checkClear() {
 
         isSolved = true;
 
+        numberHintEnabled = false;
+
+        updateNumberHintButton();
+
+        numberHintButton.style.display =
+            "none";
+
         draw();
 
         clearInterval(timer);
 
-        clearSound.play();
+        stopGameBgm();
+
+        clearSound.pause();
+        clearSound.currentTime = 0;
+
+        clearSound.play().catch(function (error) {
+
+            console.log(
+                "クリア音を再生できませんでした:",
+                error
+            );
+
+        });
+
 
 
 
@@ -1001,22 +1732,43 @@ function checkClear() {
 
 
         clearMoves.textContent =
-            "🎯 移動回数: " + moves;
+            moves + "回";
+
+        const clearMinutes =
+            Math.floor(seconds / 60);
+
+        const clearSeconds =
+            seconds % 60;
 
         clearTime.textContent =
-            "⏰ 経過時間: "
-            + Math.floor(seconds / 60)
-            + "分 "
-            + (seconds % 60)
-            + "秒";
-
-        setDifficultyButtonsDisabled(false);
-
-        clearPanel.style.display = "block";
-
-        document.body.style.overflow = "hidden";
+            String(clearMinutes).padStart(2, "0")
+            + ":"
+            + String(clearSeconds).padStart(2, "0");
 
 
+        setTimeout(function () {
+
+            clearPanel.classList.remove(
+                "show"
+            );
+
+            clearPanel.style.display =
+                "block";
+
+            document.body.style.overflow =
+                "hidden";
+
+            void clearPanel.offsetWidth;
+
+            clearPanel.classList.add(
+                "show"
+            );
+
+            setDifficultyButtonsDisabled(
+                false
+            );
+
+        }, 700);
 
 
 
@@ -1047,26 +1799,124 @@ function selectDifficulty(level) {
 
 
 
+function startTitleBgm() {
+
+
+    if (
+        titleScreen.classList.contains(
+            "title-fade-out"
+        ) ||
+        titleScreen.style.display === "none"
+    ) {
+        return;
+    }
+
+
+    if (!bgmEnabled) {
+
+        titleBgmGuide.classList.add(
+            "hidden"
+        );
+
+        return;
+
+    }
+
+    if (!titleBgm.paused) {
+        return;
+    }
+
+    titleBgm.currentTime = 0;
+    titleBgm.volume = bgmVolume;
+
+    titleBgm.play()
+        .then(function () {
+
+            titleBgmGuide.classList.add(
+                "hidden"
+            );
+
+            titleScreen.removeEventListener(
+                "pointerdown",
+                startTitleBgm
+            );
+
+            titleScreen.removeEventListener(
+                "click",
+                startTitleBgm
+            );
+
+        })
+        .catch(function () {
+
+            /*
+             * 自動再生が拒否された場合は
+             * イベントを残し、次のタップで再試行する
+             */
+
+        });
+
+}
 
 
 
 
 
-function startTitleGame() {
+titleScreen.addEventListener(
+    "pointerdown",
+    startTitleBgm
+);
 
-    buttonSound.currentTime = 0;
-    buttonSound.play();
+titleScreen.addEventListener(
+    "click",
+    startTitleBgm
+);
+
+
+
+
+
+
+function startTitleGame(event) {
+
+    event.stopPropagation();
+
+    titleScreen.removeEventListener(
+        "pointerdown",
+        startTitleBgm
+    );
+
+    titleScreen.removeEventListener(
+        "click",
+        startTitleBgm
+    );
+
 
     titleBgm.pause();
     titleBgm.currentTime = 0;
 
-    document.getElementById(
-        "title-screen"
-    ).style.display = "none";
+    titleStartSound.currentTime = 0;
 
-    document.getElementById(
-        "game-screen"
-    ).style.display = "block";
+    titleStartSound.play().catch(error => {
+        console.log(
+            "タイトル開始音を再生できませんでした:",
+            error
+        );
+    });
+
+    titleScreen.classList.add(
+        "title-fade-out"
+    );
+
+    setTimeout(function () {
+
+        titleScreen.style.display = "none";
+
+        document.getElementById(
+            "game-screen"
+        ).style.display = "block";
+
+    }, 1000);
 
 }
 
@@ -1077,9 +1927,17 @@ function startTitleGame() {
 
 
 
+window.addEventListener(
+    "resize",
+    function () {
 
+        BOARD_SIZE_PX =
+            calculateBoardSize();
 
+        draw();
 
+    }
+);
 
 
 createBoard();
@@ -1087,5 +1945,69 @@ updateBestDisplay();
 draw();
 
 
-titleBgm.volume = 0.3;
-titleBgm.play();
+titleBgm.muted =
+    !bgmEnabled;
+
+gameBgm.muted =
+    !bgmEnabled;
+
+soundEffects.forEach(function (sound) {
+
+    sound.muted =
+        !soundEffectsEnabled;
+
+});
+
+applyBgmVolume();
+applySoundEffectsVolume();
+
+const bgmVolumeSlider =
+    document.getElementById(
+        "bgm-volume"
+    );
+
+const seVolumeSlider =
+    document.getElementById(
+        "se-volume"
+    );
+
+bgmVolumeSlider.value =
+    Math.round(bgmVolume * 100);
+
+seVolumeSlider.value =
+    Math.round(
+        soundEffectsVolume * 100
+    );
+
+document.getElementById(
+    "bgm-volume-value"
+).textContent =
+    Math.round(bgmVolume * 100)
+    + "%";
+
+document.getElementById(
+    "se-volume-value"
+).textContent =
+    Math.round(
+        soundEffectsVolume * 100
+    )
+    + "%";
+
+updateSoundButtons();
+
+if (!bgmEnabled) {
+
+    titleBgmGuide.classList.add(
+        "hidden"
+    );
+
+}
+
+updateNumberHintButton();
+
+numberHintButton.style.display =
+    "none";
+
+
+
+
