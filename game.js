@@ -2993,6 +2993,8 @@ function checkClear() {
 
 
 
+let titleBgmStartPending = false;
+
 function startTitleBgm() {
     initializeAudioGraph();
 
@@ -3025,6 +3027,11 @@ function startTitleBgm() {
         return;
     }
 
+    if (titleBgmStartPending) {
+        return;
+    }
+
+    titleBgmStartPending = true;
     titleBgm.currentTime = 0;
     titleBgm.volume = bgmVolume;
 
@@ -3035,10 +3042,6 @@ function startTitleBgm() {
                 "hidden"
             );
 
-            titleScreen.removeEventListener(
-                "pointerdown",
-                startTitleBgm
-            );
 
             titleScreen.removeEventListener(
                 "click",
@@ -3047,6 +3050,7 @@ function startTitleBgm() {
 
         })
         .catch(function () {
+            titleBgmStartPending = false;
 
             /*
              * 自動再生が拒否された場合は
@@ -3061,10 +3065,6 @@ function startTitleBgm() {
 
 
 
-titleScreen.addEventListener(
-    "pointerdown",
-    startTitleBgm
-);
 
 titleScreen.addEventListener(
     "click",
@@ -3081,10 +3081,6 @@ function startTitleGame(event) {
 
     event.stopPropagation();
 
-    titleScreen.removeEventListener(
-        "pointerdown",
-        startTitleBgm
-    );
 
     titleScreen.removeEventListener(
         "click",
