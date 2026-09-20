@@ -45,3 +45,9 @@ GitHub Pages公開後にURLを記載します。
 ## 更新履歴
 
 更新内容は `CHANGELOG.md` を参照してください。
+
+
+
+
+Created by TECOGAME  
+© 2026 TECOGAME
