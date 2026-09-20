@@ -310,11 +310,16 @@ function toggleSettings() {
 
 
 
-
 function closeSettings() {
 
     buttonSound.currentTime = 0;
-    buttonSound.play();
+
+    buttonSound.play().catch(function () {
+        /*
+         * 効果音を再生できない場合でも
+         * 設定画面は閉じる
+         */
+    });
 
     settingsMenu.style.display =
         "none";
@@ -1255,7 +1260,20 @@ function draw() {
 
             tile.addEventListener(
                 "pointercancel",
-                function () {
+                function (event) {
+
+                    if (
+                        activePointerId !== null &&
+                        tile.hasPointerCapture(
+                            event.pointerId
+                        )
+                    ) {
+
+                        tile.releasePointerCapture(
+                            event.pointerId
+                        );
+
+                    }
 
                     activePointerId = null;
 
@@ -1977,15 +1995,19 @@ function startTitleBgm() {
     }
 
 
-    if (!bgmEnabled) {
+if (
+    !bgmEnabled ||
+    bgmVolume === 0
+) {
 
-        titleBgmGuide.classList.add(
-            "hidden"
-        );
+    titleBgmGuide.classList.add(
+        "hidden"
+    );
 
-        return;
+    return;
 
-    }
+}
+
 
     if (!titleBgm.paused) {
         return;
