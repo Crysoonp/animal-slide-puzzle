@@ -1,0 +1,22 @@
+# OSが作るファイル
+.DS_Store
+Thumbs.db
+
+# エディター設定
+.vscode/
+
+# Pythonキャッシュ
+__pycache__/
+*.pyc
+
+# Node.jsを導入した場合
+node_modules/
+
+# 一時ファイル
+*.tmp
+*.bak
+*.log
+
+# 公開不要なバックアップ
+backup/
+private/
