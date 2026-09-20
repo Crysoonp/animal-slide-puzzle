@@ -164,61 +164,61 @@ const translations = {
         on:
             "ON",
 
-off:
-    "OFF",
+        off:
+            "OFF",
 
-bgm:
-    "BGM",
+        bgm:
+            "BGM",
 
-bgmVolume:
-    "BGM音量",
+        bgmVolume:
+            "BGM音量",
 
-soundEffects:
-    "効果音",
+        soundEffects:
+            "効果音",
 
-soundVolume:
-    "効果音量",
+        soundVolume:
+            "効果音量",
 
-resetFewestMoves:
-    "最少移動回数をリセット",
+        resetFewestMoves:
+            "最少移動回数をリセット",
 
-resetBestTime:
-    "最短時間をリセット",
+        resetBestTime:
+            "最短時間をリセット",
 
-resetAllRecords:
-    "全記録をリセット",
+        resetAllRecords:
+            "全記録をリセット",
 
-close:
-    "閉じる",
+        close:
+            "閉じる",
 
-confirmResetFewestMoves:
-    "{difficulty}の最少移動回数をリセットしますか？",
+        confirmResetFewestMoves:
+            "{difficulty}の最少移動回数をリセットしますか？",
 
-confirmResetBestTime:
-    "{difficulty}の最短時間をリセットしますか？",
+        confirmResetBestTime:
+            "{difficulty}の最短時間をリセットしますか？",
 
-confirmResetAllRecords:
-    "すべての難易度の最少移動回数と最短時間をリセットしますか？",
-clearMovesLabel:
-    "移動回数",
-clearTimeLabel:
-    "クリア時間",
-playAgain:
-    "もう一回遊ぶ",
-moveCountSuffix:
-    "回",
+        confirmResetAllRecords:
+            "すべての難易度の最少移動回数と最短時間をリセットしますか？",
+        clearMovesLabel:
+            "移動回数",
+        clearTimeLabel:
+            "クリア時間",
+        playAgain:
+            "もう一回遊ぶ",
+        moveCountSuffix:
+            "回",
 
-titleBgmGuide:
-    "🔊 画面をタップするとBGMが流れます",
+        titleBgmGuide:
+            "🔊 画面をタップするとBGMが流れます",
 
-originalTitle:
-    "完成図",
+        originalTitle:
+            "完成図",
 
-originalClose:
-    "閉じる",
+        originalClose:
+            "閉じる",
 
-originalImageAlt:
-    "パズルの完成図"
+        originalImageAlt:
+            "パズルの完成図"
 
     },
 
@@ -300,61 +300,61 @@ originalImageAlt:
         on:
             "ON",
 
-off:
-    "OFF",
+        off:
+            "OFF",
 
-bgm:
-    "BGM",
+        bgm:
+            "BGM",
 
-bgmVolume:
-    "BGM Volume",
+        bgmVolume:
+            "BGM Volume",
 
-soundEffects:
-    "Sound Effects",
+        soundEffects:
+            "Sound Effects",
 
-soundVolume:
-    "Sound Volume",
+        soundVolume:
+            "Sound Volume",
 
-resetFewestMoves:
-    "Reset Fewest Moves",
+        resetFewestMoves:
+            "Reset Fewest Moves",
 
-resetBestTime:
-    "Reset Best Time",
+        resetBestTime:
+            "Reset Best Time",
 
-resetAllRecords:
-    "Reset All Records",
+        resetAllRecords:
+            "Reset All Records",
 
-close:
-    "Close",
+        close:
+            "Close",
 
-confirmResetFewestMoves:
-    "Reset the fewest moves record for {difficulty}?",
+        confirmResetFewestMoves:
+            "Reset the fewest moves record for {difficulty}?",
 
-confirmResetBestTime:
-    "Reset the best time record for {difficulty}?",
+        confirmResetBestTime:
+            "Reset the best time record for {difficulty}?",
 
-confirmResetAllRecords:
-    "Reset all records for every difficulty?",
-clearMovesLabel:
-    "Moves",
-clearTimeLabel:
-    "Clear Time",
-playAgain:
-    "Play Again",
-moveCountSuffix:
-    "",
+        confirmResetAllRecords:
+            "Reset all records for every difficulty?",
+        clearMovesLabel:
+            "Moves",
+        clearTimeLabel:
+            "Clear Time",
+        playAgain:
+            "Play Again",
+        moveCountSuffix:
+            "",
 
-titleBgmGuide:
-    "🔊 Tap the screen to play BGM",
+        titleBgmGuide:
+            "🔊 Tap the screen to play BGM",
 
-originalTitle:
-    "Full Image",
+        originalTitle:
+            "Full Image",
 
-originalClose:
-    "Close",
+        originalClose:
+            "Close",
 
-originalImageAlt:
-    "Completed puzzle image"
+        originalImageAlt:
+            "Completed puzzle image"
 
 
     }
@@ -480,7 +480,7 @@ function playSoundEffect(sound) {
         audioContext
         && audioContext.state === "suspended"
     ) {
-        audioContext.resume().catch(function () {});
+        audioContext.resume().catch(function () { });
     }
 
     const buffer = soundEffectBuffers.get(sound);
@@ -525,7 +525,7 @@ function playSoundEffect(sound) {
 function initializeAudioGraph() {
     if (audioGraphInitialized) {
         if (audioContext && audioContext.state === "suspended") {
-            audioContext.resume().catch(function () {});
+            audioContext.resume().catch(function () { });
         }
         return;
     }
@@ -543,12 +543,9 @@ function initializeAudioGraph() {
         soundEffectsMasterGain = audioContext.createGain();
         gameBgmFadeGain = audioContext.createGain();
 
-        const titleBgmSource =
-            audioContext.createMediaElementSource(titleBgm);
         const gameBgmSource =
             audioContext.createMediaElementSource(gameBgm);
 
-        titleBgmSource.connect(bgmMasterGain);
         gameBgmSource.connect(gameBgmFadeGain);
         gameBgmFadeGain.connect(bgmMasterGain);
         bgmMasterGain.connect(audioContext.destination);
@@ -574,7 +571,7 @@ function initializeAudioGraph() {
         applySoundEffectsVolume();
 
         if (audioContext.state === "suspended") {
-            audioContext.resume().catch(function () {});
+            audioContext.resume().catch(function () { });
         }
     } catch (error) {
         console.log("Web Audio APIを初期化できませんでした:", error);
@@ -593,9 +590,10 @@ function initializeAudioGraph() {
 function applyBgmVolume() {
     const actualVolume = bgmEnabled ? bgmVolume : 0;
 
+    titleBgm.volume = actualVolume;
+
     if (audioGraphInitialized && bgmMasterGain) {
         bgmMasterGain.gain.value = actualVolume;
-        titleBgm.volume = 1;
         gameBgm.volume = 1;
         return;
     }
@@ -909,7 +907,7 @@ function applyLanguage() {
 
 
 
-        const bgmVolumeLabel =
+    const bgmVolumeLabel =
         document.getElementById(
             "bgm-volume-label"
         );
