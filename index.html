@@ -7,7 +7,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Number Puzzle</title>
+    <title>動物スライドパズル</title>
 
     <link rel="stylesheet" href="style.css">
 
@@ -19,42 +19,7 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 <body>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -91,34 +56,35 @@
 
         <div class="mode-section">
 
-            <div class="mode-section-title">
+            <div id="picture-category-title" class="mode-section-title">
+
                 遊ぶ画像
             </div>
 
             <div id="animal-mode-container">
 
                 <button id="animal-mode-all" type="button" onclick="setAnimalMode('all')">
-
-                    おまかせ
-
+                    <span id="animal-mode-all-text">
+                        おまかせ
+                    </span>
                 </button>
 
                 <button id="animal-mode-dogs" type="button" onclick="setAnimalMode('dogs')">
-
-                    わんこ
-
+                    <span id="animal-mode-dogs-text">
+                        わんこ
+                    </span>
                 </button>
 
                 <button id="animal-mode-cats" type="button" onclick="setAnimalMode('cats')">
-
-                    にゃんこ
-
+                    <span id="animal-mode-cats-text">
+                        にゃんこ
+                    </span>
                 </button>
 
                 <button id="animal-mode-otherAnimals" type="button" onclick="setAnimalMode('otherAnimals')">
-
-                    ほかの動物
-
+                    <span id="animal-mode-other-text">
+                        ほかの動物
+                    </span>
                 </button>
 
             </div>
@@ -129,7 +95,7 @@
 
             <button id="diff-3" type="button" onclick="setDifficulty(3)">
 
-                <span class="difficulty-name">
+                <span id="difficulty-name-3" class="difficulty-name">
                     初級
                 </span>
 
@@ -141,7 +107,7 @@
 
             <button id="diff-4" type="button" onclick="setDifficulty(4)">
 
-                <span class="difficulty-name">
+                <span id="difficulty-name-4" class="difficulty-name">
                     中級
                 </span>
 
@@ -153,7 +119,7 @@
 
             <button id="diff-5" type="button" onclick="setDifficulty(5)">
 
-                <span class="difficulty-name">
+                <span id="difficulty-name-5" class="difficulty-name">
                     上級
                 </span>
 
@@ -165,7 +131,7 @@
 
             <button id="diff-6" type="button" onclick="setDifficulty(6)">
 
-                <span class="difficulty-name">
+                <span id="difficulty-name-6" class="difficulty-name">
                     超級
                 </span>
 
@@ -179,16 +145,26 @@
 
         <div class="main-actions">
 
-            <button id="cancel-button" class="cancel-button" onclick="cancelGame()" style="display: none;">
-                ⏹ 中止
+            <button id="cancel-button" class="cancel-button" type="button" onclick="cancelGame()"
+                style="display: none;">
+                ⏹
+                <span id="cancel-button-text">
+                    中止
+                </span>
             </button>
 
-            <button id="start-button" class="start-button" onclick="shuffle()" disabled>
-                ▶ ゲーム開始
+            <button id="start-button" class="start-button" type="button" onclick="shuffle()" disabled>
+                ▶
+                <span id="start-button-text">
+                    ゲーム開始
+                </span>
             </button>
 
-            <button class="settings-button" onclick="toggleSettings()">
-                ⚙️ 設定
+            <button class="settings-button" type="button" onclick="toggleSettings()">
+                ⚙️
+                <span id="settings-button-text">
+                    設定
+                </span>
             </button>
 
         </div>
@@ -235,20 +211,46 @@
 
 
 
+
+
+
         <div id="settings-menu" style="display: none;">
 
             <div id="settings-content">
 
                 <h2>
-                    ⚙️ 設定
+                    ⚙️
+                    <span id="settings-title-text">
+                        設定
+                    </span>
                 </h2>
+
+
+                <div class="language-setting">
+
+                    <div id="language-setting-title" class="language-setting-title">
+                        🌐 言語
+                    </div>
+
+                    <div class="language-buttons">
+
+                        <button id="language-ja-button" type="button" onclick="changeLanguage('ja')">
+                            日本語
+                        </button>
+
+                        <button id="language-en-button" type="button" onclick="changeLanguage('en')">
+                            English
+                        </button>
+
+                    </div>
+
+                </div>
+
 
                 <div class="sound-setting">
 
                     <button id="bgm-toggle-button" type="button" onclick="toggleBgm()">
-
                         🎵 BGM：ON
-
                     </button>
 
                     <div class="volume-control">
@@ -272,9 +274,7 @@
                 <div class="sound-setting">
 
                     <button id="se-toggle-button" type="button" onclick="toggleSoundEffects()">
-
                         🔊 効果音：ON
-
                     </button>
 
                     <div class="volume-control">
@@ -294,27 +294,26 @@
 
                 </div>
 
-                <button onclick="resetBestScore()">
+
+                <button type="button" onclick="resetBestScore()">
                     最少移動回数をリセット
                 </button>
 
-                <button onclick="resetBestTime()">
+                <button type="button" onclick="resetBestTime()">
                     最短時間をリセット
                 </button>
 
-                <button class="danger-button" onclick="resetAllRecords()">
+                <button type="button" class="danger-button" onclick="resetAllRecords()">
                     全記録をリセット
                 </button>
 
-                <button class="settings-close-button" onclick="closeSettings()">
+                <button type="button" class="settings-close-button" onclick="closeSettings()">
                     閉じる
                 </button>
 
             </div>
 
         </div>
-
-
 
 
 
@@ -350,10 +349,10 @@
                     🖼️ 完成図
                 </h2>
 
-                <img id="original-image" src="images/cat.jpg" alt="パズルの完成図tton">
+                <img id="original-image" alt="パズルの完成図">
 
-                閉じる
-
+                <button type="button" class="original-close-button" onclick="closeOriginal()">
+                    閉じる
                 </button>
 
             </div>

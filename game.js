@@ -86,6 +86,125 @@ const settingsMenu =
 
 
 
+const translations = {
+
+    ja: {
+        pageTitle:
+            "動物スライドパズル",
+
+        languageSetting:
+            "🌐 言語",
+
+        languageJapanese:
+            "日本語",
+
+        languageEnglish:
+            "English",
+
+        pictureCategory:
+            "遊ぶ画像",
+
+        animalAll:
+            "おまかせ",
+
+        animalDogs:
+            "わんこ",
+
+        animalCats:
+            "にゃんこ",
+
+        animalOther:
+            "ほかの動物",
+
+        difficultyEasy:
+            "初級",
+
+        difficultyNormal:
+            "中級",
+
+        difficultyHard:
+            "上級",
+
+        difficultyExpert:
+            "超級",
+
+        cancel:
+            "中止",
+
+        startGame:
+            "ゲーム開始",
+
+        settings:
+            "設定"
+    },
+
+    en: {
+        pageTitle:
+            "Animal Slide Puzzle",
+
+        languageSetting:
+            "🌐 Language",
+
+        languageJapanese:
+            "日本語",
+
+        languageEnglish:
+            "English",
+
+        pictureCategory:
+            "Picture Category",
+
+        animalAll:
+            "Random",
+
+        animalDogs:
+            "Dogs",
+
+        animalCats:
+            "Cats",
+
+        animalOther:
+            "Other Animals",
+
+        difficultyEasy:
+            "Easy",
+
+        difficultyNormal:
+            "Normal",
+
+        difficultyHard:
+            "Hard",
+
+        difficultyExpert:
+            "Expert",
+
+        cancel:
+            "Quit",
+
+        startGame:
+            "Start Game",
+
+        settings:
+            "Settings"
+    }
+
+};
+
+
+let currentLanguage =
+    localStorage.getItem(
+        "language"
+    ) || "ja";
+
+
+if (
+    currentLanguage !== "ja" &&
+    currentLanguage !== "en"
+) {
+    currentLanguage = "ja";
+}
+
+
 
 
 
@@ -143,6 +262,289 @@ function applySoundEffectsVolume() {
             soundEffectsVolume;
 
     });
+
+}
+
+
+
+function getText(key) {
+
+    const selectedTranslations =
+        translations[currentLanguage];
+
+    if (
+        selectedTranslations &&
+        selectedTranslations[key] !==
+        undefined
+    ) {
+        return selectedTranslations[key];
+    }
+
+    return translations.ja[key] || key;
+
+}
+
+
+function updateLanguageButtons() {
+
+    const japaneseButton =
+        document.getElementById(
+            "language-ja-button"
+        );
+
+    const englishButton =
+        document.getElementById(
+            "language-en-button"
+        );
+
+    if (
+        !japaneseButton ||
+        !englishButton
+    ) {
+        return;
+    }
+
+    japaneseButton.classList.toggle(
+        "selected-language",
+        currentLanguage === "ja"
+    );
+
+    englishButton.classList.toggle(
+        "selected-language",
+        currentLanguage === "en"
+    );
+
+    japaneseButton.setAttribute(
+        "aria-pressed",
+        String(
+            currentLanguage === "ja"
+        )
+    );
+
+    englishButton.setAttribute(
+        "aria-pressed",
+        String(
+            currentLanguage === "en"
+        )
+    );
+
+}
+
+
+function applyLanguage() {
+
+    const text =
+        translations[currentLanguage];
+
+    document.documentElement.lang =
+        currentLanguage;
+
+    document.title =
+        text.pageTitle;
+
+
+    const languageSettingTitle =
+        document.getElementById(
+            "language-setting-title"
+        );
+
+    const japaneseButton =
+        document.getElementById(
+            "language-ja-button"
+        );
+
+    const englishButton =
+        document.getElementById(
+            "language-en-button"
+        );
+
+
+    const pictureCategoryTitle =
+        document.getElementById(
+            "picture-category-title"
+        );
+
+    const animalAllText =
+        document.getElementById(
+            "animal-mode-all-text"
+        );
+
+    const animalDogsText =
+        document.getElementById(
+            "animal-mode-dogs-text"
+        );
+
+    const animalCatsText =
+        document.getElementById(
+            "animal-mode-cats-text"
+        );
+
+    const animalOtherText =
+        document.getElementById(
+            "animal-mode-other-text"
+        );
+
+
+    const difficultyEasy =
+        document.getElementById(
+            "difficulty-name-3"
+        );
+
+    const difficultyNormal =
+        document.getElementById(
+            "difficulty-name-4"
+        );
+
+    const difficultyHard =
+        document.getElementById(
+            "difficulty-name-5"
+        );
+
+    const difficultyExpert =
+        document.getElementById(
+            "difficulty-name-6"
+        );
+
+
+    const cancelButtonText =
+        document.getElementById(
+            "cancel-button-text"
+        );
+
+    const startButtonText =
+        document.getElementById(
+            "start-button-text"
+        );
+
+    const settingsButtonText =
+        document.getElementById(
+            "settings-button-text"
+        );
+
+    const settingsTitleText =
+        document.getElementById(
+            "settings-title-text"
+        );
+
+
+    if (languageSettingTitle) {
+        languageSettingTitle.textContent =
+            text.languageSetting;
+    }
+
+    if (japaneseButton) {
+        japaneseButton.textContent =
+            text.languageJapanese;
+    }
+
+    if (englishButton) {
+        englishButton.textContent =
+            text.languageEnglish;
+    }
+
+
+    if (pictureCategoryTitle) {
+        pictureCategoryTitle.textContent =
+            text.pictureCategory;
+    }
+
+    if (animalAllText) {
+        animalAllText.textContent =
+            text.animalAll;
+    }
+
+    if (animalDogsText) {
+        animalDogsText.textContent =
+            text.animalDogs;
+    }
+
+    if (animalCatsText) {
+        animalCatsText.textContent =
+            text.animalCats;
+    }
+
+    if (animalOtherText) {
+        animalOtherText.textContent =
+            text.animalOther;
+    }
+
+
+    if (difficultyEasy) {
+        difficultyEasy.textContent =
+            text.difficultyEasy;
+    }
+
+    if (difficultyNormal) {
+        difficultyNormal.textContent =
+            text.difficultyNormal;
+    }
+
+    if (difficultyHard) {
+        difficultyHard.textContent =
+            text.difficultyHard;
+    }
+
+    if (difficultyExpert) {
+        difficultyExpert.textContent =
+            text.difficultyExpert;
+    }
+
+
+    if (cancelButtonText) {
+        cancelButtonText.textContent =
+            text.cancel;
+    }
+
+    if (startButtonText) {
+        startButtonText.textContent =
+            text.startGame;
+    }
+
+    if (settingsButtonText) {
+        settingsButtonText.textContent =
+            text.settings;
+    }
+
+    if (settingsTitleText) {
+        settingsTitleText.textContent =
+            text.settings;
+    }
+
+
+    updateLanguageButtons();
+
+}
+
+
+function changeLanguage(language) {
+
+    if (
+        language !== "ja" &&
+        language !== "en"
+    ) {
+        return;
+    }
+
+    currentLanguage =
+        language;
+
+    localStorage.setItem(
+        "language",
+        currentLanguage
+    );
+
+    buttonSound.currentTime = 0;
+
+    buttonSound.play().catch(
+        function () {
+            /*
+             * 効果音を再生できない場合でも
+             * 言語変更は続ける
+             */
+        }
+    );
+
+    applyLanguage();
 
 }
 
@@ -1490,7 +1892,7 @@ function setDifficulty(size) {
         "🎯 移動回数: 0";
 
     timerText.textContent =
-        "⏰ 経過時間: 00:00";
+        "⏱ 経過時間: 00:00";
 
     updateDifficultyButtons();
 
@@ -1552,7 +1954,7 @@ function cancelGame() {
         "🎯 移動回数: 0";
 
     timerText.textContent =
-        "⏰ 経過時間: 00:00";
+        "⏱ 経過時間: 00:00";
 
     setDifficultyButtonsDisabled(false);
 
@@ -1745,18 +2147,83 @@ function shuffle() {
 
     createBoard();
 
+    let previousEmptyIndex = -1;
+
     for (let i = 0; i < 100; i++) {
 
-        const emptyIndex = numbers.indexOf(null);
+        const emptyIndex =
+            numbers.indexOf(null);
 
-        const moves =
+        let validMoves =
+            getValidMoves(emptyIndex);
+
+        const movesWithoutBacktracking =
+            validMoves.filter(
+                function (moveIndex) {
+                    return moveIndex !==
+                        previousEmptyIndex;
+                }
+            );
+
+        if (
+            movesWithoutBacktracking.length > 0
+        ) {
+            validMoves =
+                movesWithoutBacktracking;
+        }
+
+        const randomIndex =
+            validMoves[
+            Math.floor(
+                Math.random()
+                * validMoves.length
+            )
+            ];
+
+        numbers[emptyIndex] =
+            numbers[randomIndex];
+
+        numbers[randomIndex] =
+            null;
+
+        previousEmptyIndex =
+            emptyIndex;
+
+    }
+
+    const isStillSolved =
+        numbers.every(
+            function (number, index) {
+
+                if (
+                    index ===
+                    numbers.length - 1
+                ) {
+                    return number === null;
+                }
+
+                return number === index + 1;
+
+            }
+        );
+
+    if (isStillSolved) {
+
+        const emptyIndex =
+            numbers.indexOf(null);
+
+        const validMoves =
             getValidMoves(emptyIndex);
 
         const randomIndex =
-            moves[Math.floor(Math.random() * moves.length)];
+            validMoves[0];
 
-        numbers[emptyIndex] = numbers[randomIndex];
-        numbers[randomIndex] = null;
+        numbers[emptyIndex] =
+            numbers[randomIndex];
+
+        numbers[randomIndex] =
+            null;
+
     }
 
     selected = null;
@@ -1764,7 +2231,7 @@ function shuffle() {
     seconds = 0;
 
     movesText.textContent = "🎯 移動回数: 0";
-    timerText.textContent = "⏰ 経過時間: 00:00";
+    timerText.textContent = "⏱ 経過時間: 00:00";
 
     message.textContent = "";
 
@@ -1802,7 +2269,7 @@ function updateTimer() {
     const remainSeconds = seconds % 60;
 
     timerText.textContent =
-        "⏰ 経過時間: " +
+        "⏱ 経過時間: " +
         String(minutes).padStart(2, "0") +
         ":" +
         String(remainSeconds).padStart(2, "0");
@@ -1995,18 +2462,18 @@ function startTitleBgm() {
     }
 
 
-if (
-    !bgmEnabled ||
-    bgmVolume === 0
-) {
+    if (
+        !bgmEnabled ||
+        bgmVolume === 0
+    ) {
 
-    titleBgmGuide.classList.add(
-        "hidden"
-    );
+        titleBgmGuide.classList.add(
+            "hidden"
+        );
 
-    return;
+        return;
 
-}
+    }
 
 
     if (!titleBgm.paused) {
@@ -2181,6 +2648,8 @@ document.getElementById(
     + "%";
 
 updateSoundButtons();
+
+applyLanguage();
 
 if (!bgmEnabled) {
 

@@ -78,16 +78,29 @@ h1 {
 
 
 
-
 .start-button:disabled {
-
     opacity: 0.5;
 
-    filter: grayscale(100%);
+    filter:
+        grayscale(100%);
 
     cursor: not-allowed;
 
+    transform: none;
+
+    box-shadow:
+        0 5px 10px rgba(0, 0, 0, 0.15);
 }
+
+.start-button:disabled:hover,
+.start-button:disabled:active {
+    transform: none;
+
+    box-shadow:
+        0 5px 10px rgba(0, 0, 0, 0.15);
+}
+
+
 
 
 
@@ -449,9 +462,12 @@ h1 {
 
     justify-content: center;
 
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
 
     touch-action: none;
+
+    touch-action: pan-y;
 
 }
 
@@ -1472,6 +1488,96 @@ h1 {
 #title-screen.title-fade-out {
     opacity: 0;
     pointer-events: none;
+}
+
+
+
+/* 言語設定 */
+.language-setting {
+    width: 1*0%;
+    margin-bottom: 18px;
+    padding-bottom: 16px;
+
+    border-bottom:
+        1px solid rgba(0, 0, 0, 0.1);
+}
+
+
+/* 言語設定の見出し */
+.language-setting-title {
+    margin-bottom: 10px;
+
+    color: #5f6872;
+
+    font-family:
+        "M PLUS Rounded 1c",
+        sans-serif;
+
+    font-size: 14px;
+    font-weight: 900;
+
+    letter-spacing: 0.6px;
+}
+
+
+/* 日本語・Englishの配置 */
+.language-buttons {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 10px;
+
+    width: 100%;
+}
+
+
+/* 設定画面の共通指定を調整 */
+#settings-content
+.language-buttons button {
+    width: 100%;
+    min-height: 44px;
+
+    margin-top: 0;
+    padding: 10px 8px;
+
+    color: #4d5660;
+
+    background:
+        linear-gradient(
+            to bottom,
+            #ffffff,
+            #e8e8e8
+        );
+
+    border:
+        2px solid transparent;
+
+    font-size: 15px;
+
+    text-shadow: none;
+}
+
+
+/* 選択中の言語 */
+#settings-content
+.language-buttons
+button.selected-language {
+    color: white;
+
+    background:
+        linear-gradient(
+            145deg,
+            #69d77d,
+            #3fae58
+        );
+
+    border-color: #3f9e52;
+
+    box-shadow:
+        0 5px 12px
+        rgba(48, 140, 69, 0.3);
 }
 
 
@@ -2665,14 +2771,12 @@ h1 {
         rgba(255, 255, 255, 0.86);
 
     border:
-        1px solid
-        rgba(0, 0, 0, 0.08);
+        1px solid rgba(0, 0, 0, 0.08);
 
     border-radius: 15px;
 
     box-shadow:
-        0 3px 8px
-        rgba(0, 0, 0, 0.1);
+        0 3px 8px rgba(0, 0, 0, 0.1);
 
     font-family:
         "M PLUS Rounded 1c",
@@ -2688,22 +2792,18 @@ h1 {
 
 
 /* 選択中の画像モード */
-#animal-mode-container
-button.selected-animal-mode {
+#animal-mode-container button.selected-animal-mode {
     color: white;
 
     background:
-        linear-gradient(
-            145deg,
+        linear-gradient(145deg,
             #69d77d,
-            #3fae58
-        );
+            #3fae58);
 
     border-color: #3f9e52;
 
     box-shadow:
-        0 5px 12px
-        rgba(48, 140, 69, 0.28);
+        0 5px 12px rgba(48, 140, 69, 0.28);
 }
 
 
@@ -2776,6 +2876,28 @@ button.selected-animal-mode {
 
 
 
+
+/* スマホ用の言語設定 */
+@media (max-width: 768px) {
+
+    .language-setting {
+        margin-bottom: 14px;
+        padding-bottom: 13px;
+    }
+
+    .language-setting-title {
+        margin-bottom: 8px;
+        font-size: 13px;
+    }
+
+    #settings-content
+    .language-buttons button {
+        min-height: 42px;
+        padding: 9px 6px;
+        font-size: 14px;
+    }
+
+}
 
 
 
