@@ -20,3 +20,5 @@ node_modules/
 # 公開不要なバックアップ
 backup/
 private/
+# Capacitor generated web assets
+www/
