@@ -2093,14 +2093,15 @@ button.selected-language {
         left: 0;
         right: auto;
 
-        width: 76px;
+        width: 96px;
         height: 46px;
-        padding: 0 8px;
+        padding: 0 6px;
 
         font-size: 13px;
         letter-spacing: 0;
         white-space: nowrap;
     }
+
 
     .main-actions #start-button {
         position: absolute;
@@ -2127,11 +2128,12 @@ button.selected-language {
         right: 0;
         left: auto;
 
-        width: 76px;
+        width: 96px;
         height: 46px;
-        padding: 0 6px;
+        padding: 0 4px;
 
-        font-size: 13px;
+        font-size: 12px;
+        letter-spacing: 0;
         white-space: nowrap;
     }
 
@@ -2460,7 +2462,8 @@ button.selected-language {
     }
 
     .main-actions #cancel-button {
-        width: 70px;
+        width: 92px;
+        padding: 0 4px;
         font-size: 12px;
     }
 
@@ -2470,8 +2473,10 @@ button.selected-language {
     }
 
     .main-actions .settings-button {
-        width: 70px;
-        font-size: 12px;
+        width: 92px;
+        padding: 0 3px;
+        font-size: 11px;
+        letter-spacing: 0;
     }
 
     .info-panel,
