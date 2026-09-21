@@ -71,4 +71,17 @@
 - 320px幅を含む狭い画面で操作ボタンが重ならないよう改善
 - 日本語・英語の両方で主要画面の表示と操作を確認
 
+
+### Android試験版
+
+- Capacitorを使用してAndroidアプリ化
+- アプリIDを「com.crysoonp.animalslidepuzzle」に設定
+- Pixel 8・Android 16・API 36エミュレーターで基本動作を確認
+- Androidアプリ内へHTML、JavaScript、CSS、画像、BGM、効果音を組み込み
+- Android版ではHTML Audioによる直接再生を使用し、BGMと効果音が鳴らない問題を修正
+- 画面表示、タップ操作、フリック操作、BGM、効果音の正常動作を確認
+- Ver.1.2 Android試験版のデバッグAPKを作成
+- Android実機での確認は今後実施予定
+
+
 <!-- release-1.2:end -->
