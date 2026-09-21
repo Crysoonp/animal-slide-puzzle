@@ -216,7 +216,9 @@ const imageLists = {
         "dogs/dog_0132.jpg",
         "dogs/dog_0133.jpg",
         "dogs/dog_0134.jpg",
-        "dogs/dog_0135.jpg"
+        "dogs/dog_0135.jpg",
+        "dogs/marron_0000.jpg",
+        "dogs/marron_0001.jpg"
     ],
     "otherAnimals": [
         "other_animals/bird.jpg",

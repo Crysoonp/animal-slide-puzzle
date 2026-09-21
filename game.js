@@ -546,7 +546,7 @@ function isNativeCapacitorApp() {
 
 
 function initializeAudioGraph() {
-        if (isNativeCapacitorApp()) {
+    if (isNativeCapacitorApp()) {
         return;
     }
 
@@ -2742,48 +2742,94 @@ function shuffle() {
 
     createBoard();
 
-    let previousEmptyIndex = -1;
+    const shuffleSteps =
+        boardSize * boardSize * 20;
 
-    for (let i = 0; i < 100; i++) {
+    const maximumCorrectTiles =
+        Math.floor(
+            (boardSize * boardSize - 1) * 0.25
+        );
 
-        const emptyIndex =
-            numbers.indexOf(null);
+    const maximumShuffleAttempts = 20;
 
-        let validMoves =
-            getValidMoves(emptyIndex);
+    for (
+        let attempt = 0;
+        attempt < maximumShuffleAttempts;
+        attempt++
+    ) {
+        createBoard();
 
-        const movesWithoutBacktracking =
-            validMoves.filter(
-                function (moveIndex) {
-                    return moveIndex !==
-                        previousEmptyIndex;
-                }
+        let previousEmptyIndex = -1;
+
+        for (
+            let i = 0;
+            i < shuffleSteps;
+            i++
+        ) {
+            const emptyIndex =
+                numbers.indexOf(null);
+
+            let validMoves =
+                getValidMoves(emptyIndex);
+
+            const movesWithoutBacktracking =
+                validMoves.filter(
+                    function (moveIndex) {
+                        return moveIndex !==
+                            previousEmptyIndex;
+                    }
+                );
+
+            if (
+                movesWithoutBacktracking.length > 0
+            ) {
+                validMoves =
+                    movesWithoutBacktracking;
+            }
+
+            const randomIndex =
+                validMoves[
+                Math.floor(
+                    Math.random()
+                    * validMoves.length
+                )
+                ];
+
+            numbers[emptyIndex] =
+                numbers[randomIndex];
+
+            numbers[randomIndex] =
+                null;
+
+            previousEmptyIndex =
+                emptyIndex;
+        }
+
+        const correctTileCount =
+            numbers.reduce(
+                function (
+                    count,
+                    number,
+                    index
+                ) {
+                    if (
+                        number !== null &&
+                        number === index + 1
+                    ) {
+                        return count + 1;
+                    }
+
+                    return count;
+                },
+                0
             );
 
         if (
-            movesWithoutBacktracking.length > 0
+            correctTileCount <=
+            maximumCorrectTiles
         ) {
-            validMoves =
-                movesWithoutBacktracking;
+            break;
         }
-
-        const randomIndex =
-            validMoves[
-            Math.floor(
-                Math.random()
-                * validMoves.length
-            )
-            ];
-
-        numbers[emptyIndex] =
-            numbers[randomIndex];
-
-        numbers[randomIndex] =
-            null;
-
-        previousEmptyIndex =
-            emptyIndex;
-
     }
 
     const isStillSolved =
