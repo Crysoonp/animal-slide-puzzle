@@ -2907,3 +2907,30 @@ button.selected-language {
 
 
 
+
+
+
+
+/* 320px前後の狭い画面用 */
+@media (max-width: 340px) {
+
+    .main-actions #cancel-button {
+        width: 88px;
+        padding: 0 3px;
+        font-size: 11px;
+    }
+
+    .main-actions #start-button {
+        width: 124px;
+        padding: 0 6px;
+        font-size: 13px;
+    }
+
+    .main-actions .settings-button {
+        width: 88px;
+        padding: 0 2px;
+        font-size: 10px;
+        letter-spacing: 0;
+    }
+
+}
