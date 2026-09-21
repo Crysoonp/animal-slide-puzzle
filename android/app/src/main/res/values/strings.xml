@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Animal Slide Puzzle</string>
+    <string name="title_activity_main">Animal Slide Puzzle</string>
+    <string name="package_name">com.crysoonp.animalslidepuzzle</string>
+    <string name="custom_url_scheme">com.crysoonp.animalslidepuzzle</string>
+</resources>

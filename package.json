@@ -1,0 +1,29 @@
+{
+  "name": "animal-slide-puzzle",
+  "version": "1.0.0",
+  "description": "かわいい動物写真を使った、スマートフォン対応のスライドパズルです。",
+  "main": "game.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Crysoonp/animal-slide-puzzle.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Crysoonp/animal-slide-puzzle/issues"
+  },
+  "homepage": "https://github.com/Crysoonp/animal-slide-puzzle#readme",
+  "dependencies": {
+    "@capacitor/android": "^8.5.2",
+    "@capacitor/cli": "^8.5.2",
+    "@capacitor/core": "^8.5.2"
+  }
+}

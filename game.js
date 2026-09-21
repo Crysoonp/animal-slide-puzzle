@@ -469,6 +469,9 @@ function loadSoundEffectBuffers() {
     return soundEffectLoadPromise;
 }
 
+
+
+
 function playSoundEffect(sound) {
     initializeAudioGraph();
 
@@ -517,12 +520,36 @@ function playSoundEffect(sound) {
         sound.muted = !soundEffectsEnabled;
         sound.currentTime = 0;
         return sound.play();
-    }).catch(function () {
+    }).catch(function (error) {
+        console.error("効果音再生エラー:", error);
         /* 効果音が鳴らなくてもゲーム処理は続ける */
     });
 }
 
+
+
+function isNativeCapacitorApp() {
+    if (
+        window.Capacitor &&
+        typeof window.Capacitor.isNativePlatform === "function" &&
+        window.Capacitor.isNativePlatform()
+    ) {
+        return true;
+    }
+
+    return (
+        window.location.hostname === "localhost" &&
+        /Android/i.test(navigator.userAgent)
+    );
+}
+
+
+
 function initializeAudioGraph() {
+        if (isNativeCapacitorApp()) {
+        return;
+    }
+
     if (audioGraphInitialized) {
         if (audioContext && audioContext.state === "suspended") {
             audioContext.resume().catch(function () { });
@@ -3047,7 +3074,8 @@ function startTitleBgm() {
             );
 
         })
-        .catch(function () {
+        .catch(function (error) {
+            console.error("タイトルBGM再生エラー:", error);
             titleBgmStartPending = false;
 
             /*
