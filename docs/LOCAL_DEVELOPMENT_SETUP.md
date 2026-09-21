@@ -24,7 +24,7 @@ GitHub Codespacesを使わず、Windows PC上で動物スライドパズルを�
 プロジェクトを開く場所:
 
 ```text
-C:\Users\hito5\Documents\GitHub\animal-slide-puzzle
+%USERPROFILE%\Documents\GitHub\animal-slide-puzzle
 ```
 
 フォルダーを開く手順:
@@ -33,7 +33,7 @@ C:\Users\hito5\Documents\GitHub\animal-slide-puzzle
 Visual Studio Code
 → File
 → Open Folder
-→ C:\Users\hito5\Documents\GitHub\animal-slide-puzzle
+→ %USERPROFILE%\Documents\GitHub\animal-slide-puzzle
 ```
 
 ターミナルを開く手順:
@@ -161,7 +161,7 @@ https://github.com/Crysoonp/animal-slide-puzzle.git
 PC上の保存場所:
 
 ```text
-C:\Users\hito5\Documents\GitHub\animal-slide-puzzle
+%USERPROFILE%\Documents\GitHub\animal-slide-puzzle
 ```
 
 再取得するときのコマンド:
@@ -324,5 +324,5 @@ Android関連のアプリや設定を追加した場合は、このファイル�
 正しいターミナル位置:
 
 ```text
-PS C:\Users\hito5\Documents\GitHub\animal-slide-puzzle>
+PS %USERPROFILE%\Documents\GitHub\animal-slide-puzzle>
 ```
