@@ -284,12 +284,9 @@
 
                     <div class="volume-control">
 
-<label
-    id="se-volume-label"
-    for="se-volume"
->
-    効果音量
-</label>
+                        <label id="se-volume-label" for="se-volume">
+                            効果音量
+                        </label>
 
                         <input id="se-volume" type="range" min="0" max="100" step="1" value="70"
                             oninput="changeSoundEffectsVolume(this.value)">
@@ -303,39 +300,22 @@
                 </div>
 
 
-<button
-    id="reset-best-score-button"
-    type="button"
-    onclick="resetBestScore()"
->
-    最少移動回数をリセット
-</button>
+                <button id="reset-best-score-button" type="button" onclick="resetBestScore()">
+                    最少移動回数をリセット
+                </button>
 
-<button
-    id="reset-best-time-button"
-    type="button"
-    onclick="resetBestTime()"
->
-    最短時間をリセット
-</button>
+                <button id="reset-best-time-button" type="button" onclick="resetBestTime()">
+                    最短時間をリセット
+                </button>
 
-<button
-    id="reset-all-records-button"
-    type="button"
-    class="danger-button"
-    onclick="resetAllRecords()"
->
-    全記録をリセット
-</button>
+                <button id="reset-all-records-button" type="button" class="danger-button" onclick="resetAllRecords()">
+                    全記録をリセット
+                </button>
 
-<button
-    id="settings-close-button"
-    type="button"
-    class="settings-close-button"
-    onclick="closeSettings()"
->
-    閉じる
-</button>
+                <button id="settings-close-button" type="button" class="settings-close-button"
+                    onclick="closeSettings()">
+                    閉じる
+                </button>
 
             </div>
 
@@ -377,7 +357,8 @@
 
                 <img id="original-image" alt="パズルの完成図">
 
-                <button id="original-close-button" type="button" class="original-close-button" onclick="closeOriginal()">
+                <button id="original-close-button" type="button" class="original-close-button"
+                    onclick="closeOriginal()">
                     閉じる
                 </button>
 
@@ -460,7 +441,7 @@
 
     </div>
 
-    <script src="image-list.js"></script>
+    <script src="image-list.js?v=1.3"></script>
 
     <script src="game.js"></script>
 
