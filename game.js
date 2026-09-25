@@ -3144,6 +3144,149 @@ function createClearConfetti() {
     }
 }
 
+/* ========================================
+   Ver.1.5.1 記録評価とゆったりクリア演出
+======================================== */
+function getPlayHistoryKey() {
+    return "playHistory_" + boardSize;
+}
+
+function getPlayHistory() {
+    try {
+        const saved = JSON.parse(
+            localStorage.getItem(getPlayHistoryKey()) || "[]"
+        );
+        return Array.isArray(saved) ? saved : [];
+    } catch (error) {
+        return [];
+    }
+}
+
+function saveCurrentPlayToHistory() {
+    if (moves <= 0) {
+        return;
+    }
+    const history = getPlayHistory();
+    history.push({ moves: moves, seconds: seconds });
+    localStorage.setItem(
+        getPlayHistoryKey(),
+        JSON.stringify(history.slice(-30))
+    );
+}
+
+function buildClearEvaluationMessages() {
+    if (moves <= 0) {
+        return currentLanguage === "en"
+            ? ["Celebration preview"]
+            : ["クリア演出の確認です"];
+    }
+
+    const history = getPlayHistory();
+    const previous = history.length > 0
+        ? history[history.length - 1]
+        : null;
+    const oldBestMoves = getBestScore();
+    const oldBestTime = getBestTime();
+    const messages = [];
+
+    if (
+        oldBestMoves === null ||
+        moves < Number(oldBestMoves)
+    ) {
+        messages.push(
+            currentLanguage === "en"
+                ? "🏅 New fewest-moves record!"
+                : "🏅 最少移動回数を更新！"
+        );
+    } else if (
+        previous &&
+        moves < Number(previous.moves)
+    ) {
+        const difference = Number(previous.moves) - moves;
+        messages.push(
+            currentLanguage === "en"
+                ? `✨ ${difference} fewer moves than last time!`
+                : `✨ 前回より${difference}回少なく解けました！`
+        );
+    } else if (
+        previous &&
+        moves === Number(previous.moves)
+    ) {
+        messages.push(
+            currentLanguage === "en"
+                ? "🐾 Same move count as last time!"
+                : "🐾 前回と同じ移動回数です！"
+        );
+    } else if (history.length >= 3) {
+        const averageMoves = history.reduce(
+            function (total, record) {
+                return total + Number(record.moves || 0);
+            },
+            0
+        ) / history.length;
+        if (moves < averageMoves) {
+            messages.push(
+                currentLanguage === "en"
+                    ? "✨ Smoother than your usual play!"
+                    : "✨ いつもの記録よりスムーズ！"
+            );
+        }
+    }
+
+    if (
+        oldBestTime === null ||
+        seconds < Number(oldBestTime)
+    ) {
+        messages.push(
+            currentLanguage === "en"
+                ? "⭐ New personal best time!"
+                : "⭐ 自分の最短時間を更新！"
+        );
+    }
+
+    if (messages.length === 0) {
+        messages.push(
+            currentLanguage === "en"
+                ? "🐾 Nice and steady completion!"
+                : "🐾 じっくり完成できました！"
+        );
+    }
+
+    return messages.slice(0, 2);
+}
+
+function showClearEvaluation() {
+    const clearContent = document.getElementById("clear-content");
+    if (!clearContent) {
+        return;
+    }
+
+    let evaluation = document.getElementById("clear-evaluation");
+    if (!evaluation) {
+        evaluation = document.createElement("div");
+        evaluation.id = "clear-evaluation";
+        const clearButtons = document.getElementById("clear-buttons");
+        if (clearButtons) {
+            clearContent.insertBefore(evaluation, clearButtons);
+        } else {
+            clearContent.appendChild(evaluation);
+        }
+    }
+
+    const messages = buildClearEvaluationMessages();
+    evaluation.innerHTML = "";
+    messages.forEach(function (messageText) {
+        const line = document.createElement("div");
+        line.className = "clear-evaluation-line";
+        line.textContent = messageText;
+        evaluation.appendChild(line);
+    });
+    evaluation.classList.remove("show");
+    void evaluation.offsetWidth;
+    evaluation.classList.add("show");
+    saveCurrentPlayToHistory();
+}
+
 function startClearCelebration() {
     stopClearCelebration();
 
@@ -3288,6 +3431,7 @@ function checkClear() {
         ).style.display = "none";
 
         updateClearResultDisplay();
+        showClearEvaluation();
 
 
         setTimeout(function () {
