@@ -1413,6 +1413,7 @@ function resetAllRecords() {
 
 
 function closeClearPanel() {
+    stopClearCelebration();
 
     gameScreen.classList.remove(
         "game-playing"
@@ -1485,6 +1486,7 @@ function closeClearPanel() {
 
 
 function playAgain() {
+    stopClearCelebration();
 
     clearPanel.classList.remove("show");
 
@@ -1981,7 +1983,6 @@ let isTileAnimating = false;
 
 
 function draw() {
-
     game.classList.toggle(
         "solved",
         isSolved
@@ -1990,17 +1991,13 @@ function draw() {
     const tileSize =
         BOARD_SIZE_PX / boardSize;
 
-
     game.style.gridTemplateColumns =
         `repeat(${boardSize}, ${tileSize}px)`;
-
 
     game.innerHTML = "";
 
     numbers.forEach((num, index) => {
-
         const tile = document.createElement("div");
-
         tile.className = "tile";
 
         if (
@@ -2008,315 +2005,89 @@ function draw() {
             num !== null &&
             !isSolved
         ) {
-
             const numberBadge =
                 document.createElement("span");
-
             numberBadge.className =
                 "tile-number";
-
             numberBadge.textContent =
                 num;
 
             if (boardSize >= 5) {
-
                 numberBadge.classList.add(
                     "small"
                 );
-
             }
 
             tile.appendChild(
                 numberBadge
             );
-
         }
 
         tile.style.width =
             `${tileSize}px`;
-
         tile.style.height =
             `${tileSize}px`;
 
-
-
-
         const emptyIndex = numbers.indexOf(null);
-
         const validMoves =
             getValidMoves(emptyIndex);
-
-        if (
+        const isMovable =
             gameStarted &&
             !isSolved &&
-            validMoves.includes(index)
-        ) {
+            validMoves.includes(index);
 
+        if (isMovable) {
             tile.classList.add("movable");
+            tile.style.touchAction = "none";
+            tile.style.userSelect = "none";
+            tile.style.webkitUserSelect = "none";
         }
 
-
-
-
         if (num === null) {
-
             if (isSolved) {
-
                 const row = boardSize - 1;
                 const col = boardSize - 1;
-
                 tile.style.backgroundImage =
                     `url('images/${currentImage}')`;
-
                 tile.style.backgroundSize =
                     `${BOARD_SIZE_PX}px ${BOARD_SIZE_PX}px`;
-
                 tile.style.backgroundPosition =
                     `-${col * tileSize}px -${row * tileSize}px`;
-
                 tile.classList.add("fade-in");
-
             } else {
-
                 tile.style.backgroundImage = "none";
                 tile.style.background = "#d9d9d9";
-
             }
-
         } else {
-
             const row =
                 Math.floor((num - 1) / boardSize);
-
             const col =
                 (num - 1) % boardSize;
 
             if (gameStarted) {
-
                 tile.style.backgroundImage =
                     `url('images/${currentImage}')`;
-
                 tile.style.backgroundSize =
                     `${BOARD_SIZE_PX}px ${BOARD_SIZE_PX}px`;
-
                 tile.style.backgroundPosition =
                     `-${col * tileSize}px -${row * tileSize}px`;
-
             } else {
-
                 tile.style.backgroundImage = "none";
                 tile.style.background = "#d9d9d9";
-
             }
-
         }
 
         if (selected === index) {
             tile.style.background = "orange";
         }
 
-        if (!isSolved) {
-
-            let pointerStartX = 0;
-            let pointerStartY = 0;
-            let activePointerId = null;
-
-
-            tile.addEventListener(
-                "pointerdown",
-                function (event) {
-
-                    if (
-                        !gameStarted ||
-                        isSolved ||
-                        isTileAnimating
-                    ) {
-                        return;
-                    }
-
-                    pointerStartX =
-                        event.clientX;
-
-                    pointerStartY =
-                        event.clientY;
-
-                    activePointerId =
-                        event.pointerId;
-
-                    tile.setPointerCapture(
-                        event.pointerId
-                    );
-
-                }
+        if (!isSolved && isMovable) {
+            addTilePointerControls(
+                tile,
+                index,
+                emptyIndex,
+                tileSize
             );
-
-
-            tile.addEventListener(
-                "pointerup",
-                function (event) {
-
-                    if (
-                        activePointerId === null ||
-                        event.pointerId !==
-                        activePointerId
-                    ) {
-                        return;
-                    }
-
-                    const moveX =
-                        event.clientX -
-                        pointerStartX;
-
-                    const moveY =
-                        event.clientY -
-                        pointerStartY;
-
-                    activePointerId = null;
-
-                    if (
-                        tile.hasPointerCapture(
-                            event.pointerId
-                        )
-                    ) {
-
-                        tile.releasePointerCapture(
-                            event.pointerId
-                        );
-
-                    }
-
-                    const flickDistance = 24;
-
-                    const isTap =
-                        Math.abs(moveX)
-                        < flickDistance &&
-                        Math.abs(moveY)
-                        < flickDistance;
-
-                    if (isTap) {
-
-                        moveTile(index);
-
-                        return;
-
-                    }
-
-                    const emptyIndex =
-                        numbers.indexOf(null);
-
-                    const validMoves =
-                        getValidMoves(
-                            emptyIndex
-                        );
-
-                    if (
-                        !validMoves.includes(index)
-                    ) {
-                        return;
-                    }
-
-                    const tileRow =
-                        Math.floor(
-                            index / boardSize
-                        );
-
-                    const tileCol =
-                        index % boardSize;
-
-                    const emptyRow =
-                        Math.floor(
-                            emptyIndex / boardSize
-                        );
-
-                    const emptyCol =
-                        emptyIndex % boardSize;
-
-                    let flickDirection = "";
-
-                    if (
-                        Math.abs(moveX) >
-                        Math.abs(moveY)
-                    ) {
-
-                        flickDirection =
-                            moveX > 0
-                                ? "right"
-                                : "left";
-
-                    } else {
-
-                        flickDirection =
-                            moveY > 0
-                                ? "down"
-                                : "up";
-
-                    }
-
-                    let requiredDirection = "";
-
-                    if (emptyCol > tileCol) {
-
-                        requiredDirection =
-                            "right";
-
-                    } else if (
-                        emptyCol < tileCol
-                    ) {
-
-                        requiredDirection =
-                            "left";
-
-                    } else if (
-                        emptyRow > tileRow
-                    ) {
-
-                        requiredDirection =
-                            "down";
-
-                    } else if (
-                        emptyRow < tileRow
-                    ) {
-
-                        requiredDirection =
-                            "up";
-
-                    }
-
-                    if (
-                        flickDirection ===
-                        requiredDirection
-                    ) {
-
-                        moveTile(index);
-
-                    }
-
-                }
-            );
-
-
-            tile.addEventListener(
-                "pointercancel",
-                function (event) {
-
-                    if (
-                        activePointerId !== null &&
-                        tile.hasPointerCapture(
-                            event.pointerId
-                        )
-                    ) {
-
-                        tile.releasePointerCapture(
-                            event.pointerId
-                        );
-
-                    }
-
-                    activePointerId = null;
-
-                }
-            );
-
         }
 
         game.appendChild(tile);
@@ -2324,14 +2095,290 @@ function draw() {
 }
 
 
+function addTilePointerControls(
+    tile,
+    index,
+    emptyIndex,
+    tileSize
+) {
+    let activePointerId = null;
+    let pointerStartX = 0;
+    let pointerStartY = 0;
+    let currentX = 0;
+    let currentY = 0;
+    let currentScaleX = 1;
+    let currentScaleY = 1;
+    let hasDragged = false;
+    let pressAnimation = null;
 
+    const tileRow =
+        Math.floor(index / boardSize);
+    const tileCol =
+        index % boardSize;
+    const emptyRow =
+        Math.floor(emptyIndex / boardSize);
+    const emptyCol =
+        emptyIndex % boardSize;
+    const axis =
+        tileRow === emptyRow ? "x" : "y";
+    const direction =
+        axis === "x"
+            ? Math.sign(emptyCol - tileCol)
+            : Math.sign(emptyRow - tileRow);
 
+    function updatePuniShape(progress) {
+        const easedProgress =
+            Math.sin(Math.min(1, progress) * Math.PI / 2);
+        const stretch = 0.055 * easedProgress;
+        const squeeze = 0.04 * easedProgress;
 
+        if (axis === "x") {
+            currentScaleX = 1.035 + stretch;
+            currentScaleY = 1.025 - squeeze;
+        } else {
+            currentScaleX = 1.025 - squeeze;
+            currentScaleY = 1.035 + stretch;
+        }
+    }
 
+    function releasePointer(event) {
+        if (
+            tile.hasPointerCapture &&
+            tile.hasPointerCapture(event.pointerId)
+        ) {
+            tile.releasePointerCapture(event.pointerId);
+        }
+        activePointerId = null;
+    }
 
+    function cancelPressAnimation() {
+        if (pressAnimation) {
+            pressAnimation.cancel();
+            pressAnimation = null;
+        }
+    }
 
+    function resetLiftStyles() {
+        cancelPressAnimation();
+        tile.style.willChange = "";
+        tile.style.filter = "";
+        tile.style.borderRadius = "";
+    }
 
+    function animateBack(event) {
+        isTileAnimating = true;
+        const returnAnimation = tile.animate(
+            [
+                {
+                    transform:
+                        `translate(${currentX}px, ${currentY}px) scale(${currentScaleX}, ${currentScaleY})`,
+                    filter:
+                        "drop-shadow(0 8px 8px rgba(0, 0, 0, 0.24))"
+                },
+                {
+                    transform:
+                        "translate(0px, 0px) scale(1)",
+                    filter:
+                        "drop-shadow(0 0 0 rgba(0, 0, 0, 0))"
+                }
+            ],
+            {
+                duration: 150,
+                easing:
+                    "cubic-bezier(0.22, 0.61, 0.36, 1)"
+            }
+        );
 
+        returnAnimation.finished
+            .catch(function () { })
+            .finally(function () {
+                releasePointer(event);
+                resetLiftStyles();
+                isTileAnimating = false;
+                draw();
+            });
+    }
+
+    tile.addEventListener(
+        "pointerdown",
+        function (event) {
+            if (
+                !gameStarted ||
+                isSolved ||
+                isTileAnimating
+            ) {
+                return;
+            }
+
+            event.preventDefault();
+            activePointerId = event.pointerId;
+            pointerStartX = event.clientX;
+            pointerStartY = event.clientY;
+            currentX = 0;
+            currentY = 0;
+            currentScaleX =
+                axis === "x" ? 0.975 : 1.065;
+            currentScaleY =
+                axis === "y" ? 0.975 : 1.065;
+            hasDragged = false;
+
+            tile.setPointerCapture(event.pointerId);
+            tile.style.zIndex = "20";
+            tile.style.willChange =
+                "transform, filter, border-radius";
+            tile.style.borderRadius = "12px";
+
+            pressAnimation = tile.animate(
+                [
+                    {
+                        transform:
+                            "translate(0px, 0px) scale(1)",
+                        filter:
+                            "brightness(1) saturate(1) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.12))"
+                    },
+                    {
+                        transform:
+                            "translate(0px, 2px) scale(1.075, 0.94)",
+                        filter:
+                            "brightness(1.035) saturate(1.02) drop-shadow(0 2px 3px rgba(0, 0, 0, 0.16))",
+                        offset: 0.46
+                    },
+                    {
+                        transform:
+                            `translate(0px, 0px) scale(${currentScaleX}, ${currentScaleY})`,
+                        filter:
+                            "brightness(1.07) saturate(1.045) drop-shadow(0 9px 9px rgba(0, 0, 0, 0.26))"
+                    }
+                ],
+                {
+                    duration: 115,
+                    easing:
+                        "cubic-bezier(0.2, 0.8, 0.25, 1)",
+                    fill: "forwards"
+                }
+            );
+        }
+    );
+
+    tile.addEventListener(
+        "pointermove",
+        function (event) {
+            if (
+                activePointerId === null ||
+                event.pointerId !== activePointerId ||
+                isTileAnimating
+            ) {
+                return;
+            }
+
+            event.preventDefault();
+            const rawX =
+                event.clientX - pointerStartX;
+            const rawY =
+                event.clientY - pointerStartY;
+            const axisDistance =
+                axis === "x" ? rawX : rawY;
+            const directedDistance =
+                Math.max(
+                    0,
+                    Math.min(
+                        tileSize,
+                        axisDistance * direction
+                    )
+                );
+
+            currentX =
+                axis === "x"
+                    ? directedDistance * direction
+                    : 0;
+            currentY =
+                axis === "y"
+                    ? directedDistance * direction
+                    : 0;
+
+            if (
+                Math.abs(rawX) >= 6 ||
+                Math.abs(rawY) >= 6
+            ) {
+                hasDragged = true;
+            }
+
+            updatePuniShape(
+                directedDistance / tileSize
+            );
+            cancelPressAnimation();
+            tile.style.filter =
+                "brightness(1.07) saturate(1.045) drop-shadow(0 9px 9px rgba(0, 0, 0, 0.26))";
+            tile.style.transform =
+                `translate(${currentX}px, ${currentY}px) scale(${currentScaleX}, ${currentScaleY})`;
+        }
+    );
+
+    tile.addEventListener(
+        "pointerup",
+        function (event) {
+            if (
+                activePointerId === null ||
+                event.pointerId !== activePointerId ||
+                isTileAnimating
+            ) {
+                return;
+            }
+
+            event.preventDefault();
+            const travelled =
+                axis === "x"
+                    ? Math.abs(currentX)
+                    : Math.abs(currentY);
+            const commitDistance =
+                Math.max(
+                    24,
+                    Math.min(42, tileSize * 0.35)
+                );
+
+            if (!hasDragged) {
+                releasePointer(event);
+                resetLiftStyles();
+                tile.style.transform = "";
+                moveTile(index);
+                return;
+            }
+
+            if (travelled >= commitDistance) {
+                releasePointer(event);
+                resetLiftStyles();
+                completeTileMove(
+                    index,
+                    tile,
+                    currentX,
+                    currentY
+                );
+                return;
+            }
+
+            animateBack(event);
+        }
+    );
+
+    tile.addEventListener(
+        "pointercancel",
+        function (event) {
+            if (
+                activePointerId === null ||
+                event.pointerId !== activePointerId
+            ) {
+                return;
+            }
+
+            if (isTileAnimating) {
+                releasePointer(event);
+                return;
+            }
+
+            animateBack(event);
+        }
+    );
+}
 
 function getValidMoves(emptyIndex) {
 
@@ -2363,7 +2410,6 @@ function getValidMoves(emptyIndex) {
 
 
 function moveTile(index) {
-
     if (
         !gameStarted ||
         isSolved ||
@@ -2374,7 +2420,6 @@ function moveTile(index) {
 
     const emptyIndex =
         numbers.indexOf(null);
-
     const validMoves =
         getValidMoves(emptyIndex);
 
@@ -2389,33 +2434,74 @@ function moveTile(index) {
         return;
     }
 
+    completeTileMove(
+        index,
+        tile,
+        0,
+        0
+    );
+}
+
+
+function completeTileMove(
+    index,
+    tile,
+    startX,
+    startY
+) {
+    if (
+        !gameStarted ||
+        isSolved ||
+        isTileAnimating
+    ) {
+        return;
+    }
+
+    const emptyIndex =
+        numbers.indexOf(null);
+    const validMoves =
+        getValidMoves(emptyIndex);
+
+    if (!validMoves.includes(index)) {
+        tile.style.transform = "";
+        tile.style.filter = "";
+        tile.style.willChange = "";
+        return;
+    }
+
     isTileAnimating = true;
 
     const tileSize =
         BOARD_SIZE_PX / boardSize;
-
     const tileRow =
         Math.floor(index / boardSize);
-
     const tileCol =
         index % boardSize;
-
     const emptyRow =
         Math.floor(emptyIndex / boardSize);
-
     const emptyCol =
         emptyIndex % boardSize;
-
     const moveX =
         (emptyCol - tileCol)
         * tileSize;
-
     const moveY =
         (emptyRow - tileRow)
         * tileSize;
+    const remainingDistance =
+        Math.hypot(
+            moveX - startX,
+            moveY - startY
+        );
+    const duration =
+        Math.max(
+            80,
+            Math.min(
+                200,
+                200 * remainingDistance / tileSize
+            )
+        );
 
     moveSound.currentTime = 0;
-
     playSoundEffect(moveSound).catch(function () {
         /*
          * 効果音を再生できない場合でも
@@ -2423,64 +2509,75 @@ function moveTile(index) {
          */
     });
 
-    tile.style.zIndex = "10";
+    tile.style.zIndex = "20";
+    tile.style.willChange = "transform, filter";
+
+    let impactHapticTriggered = false;
+    const impactHapticTimer = setTimeout(function () {
+        impactHapticTriggered = true;
+        triggerMoveHaptic();
+    }, Math.round(duration * 0.72));
 
     const slideAnimation =
         tile.animate(
             [
                 {
                     transform:
-                        "translate(0px, 0px)"
+                        `translate(${startX}px, ${startY}px) scale(1.085, 0.955)`,
+                    filter:
+                        "brightness(1.07) saturate(1.045) drop-shadow(0 9px 9px rgba(0, 0, 0, 0.26))"
                 },
                 {
                     transform:
-                        `translate(${moveX}px, ${moveY}px)`
+                        `translate(${moveX}px, ${moveY}px) scale(1.075, 0.93)`,
+                    filter:
+                        "brightness(1.045) saturate(1.025) drop-shadow(0 2px 3px rgba(0, 0, 0, 0.17))",
+                    offset: 0.72
+                },
+                {
+                    transform:
+                        `translate(${moveX}px, ${moveY}px) scale(0.975, 1.045)`,
+                    filter:
+                        "brightness(1.025) saturate(1.015) drop-shadow(0 3px 5px rgba(0, 0, 0, 0.16))",
+                    offset: 0.88
+                },
+                {
+                    transform:
+                        `translate(${moveX}px, ${moveY}px) scale(1)`,
+                    filter:
+                        "brightness(1) saturate(1) drop-shadow(0 0 0 rgba(0, 0, 0, 0))"
                 }
             ],
             {
-                duration: 200,
-
+                duration: duration,
                 easing:
                     "cubic-bezier(0.22, 0.61, 0.36, 1)",
-
                 fill: "forwards"
             }
         );
 
     slideAnimation.finished
         .then(function () {
-
             numbers[emptyIndex] =
                 numbers[index];
-
             numbers[index] =
                 null;
-
             moves++;
-
-            triggerMoveHaptic();
+            if (!impactHapticTriggered) {
+                clearTimeout(impactHapticTimer);
+                triggerMoveHaptic();
+            }
             updateMovesDisplay();
-
             isTileAnimating = false;
-
             draw();
-
             checkClear();
-
         })
         .catch(function () {
-
+            clearTimeout(impactHapticTimer);
             isTileAnimating = false;
-
             draw();
-
         });
-
 }
-
-
-
-
 
 function setDifficulty(size) {
 
@@ -2547,6 +2644,7 @@ function setDifficulty(size) {
 
 
 function cancelGame() {
+    stopClearCelebration();
 
     gameScreen.classList.remove(
         "game-playing"
@@ -2750,6 +2848,7 @@ function stopGameBgm() {
 
 
 function shuffle() {
+    stopClearCelebration();
 
     gameScreen.classList.add(
         "game-playing"
@@ -2950,6 +3049,135 @@ function updateTimer() {
 
 
 
+/* ========================================
+   Ver.1.5 クリアお祝い演出
+======================================== */
+const clearPraiseMessages = {
+    ja: {
+        3: ["ナイス！", "できたね！", "いい感じ！"],
+        4: ["グッド！", "やったね！", "すごい！"],
+        5: ["グレート！", "すごい！", "おみごと！"],
+        6: ["かんぺき！", "超すごい！", "大成功！"]
+    },
+    en: {
+        3: ["Nice!", "You did it!", "Good job!"],
+        4: ["Great!", "Well done!", "Amazing!"],
+        5: ["Excellent!", "Fantastic!", "Great work!"],
+        6: ["Perfect!", "Incredible!", "Outstanding!"]
+    }
+};
+
+const clearStampMessages = {
+    ja: {
+        3: ["クリア！", "ナイス！"],
+        4: ["グッド！", "クリア！"],
+        5: ["グレート！", "すごい！"],
+        6: ["かんぺき！", "超級クリア！"]
+    },
+    en: {
+        3: ["CLEAR!", "NICE!"],
+        4: ["GOOD!", "CLEAR!"],
+        5: ["GREAT!", "AMAZING!"],
+        6: ["PERFECT!", "EXPERT CLEAR!"]
+    }
+};
+
+let clearCelebrationTimers = [];
+
+function clearCelebrationTimeout(callback, delay) {
+    const timerId = setTimeout(callback, delay);
+    clearCelebrationTimers.push(timerId);
+    return timerId;
+}
+
+function stopClearCelebration() {
+    clearCelebrationTimers.forEach(function (timerId) {
+        clearTimeout(timerId);
+    });
+    clearCelebrationTimers = [];
+
+    const celebration = document.getElementById("clear-celebration");
+    const confettiLayer = document.getElementById("clear-confetti-layer");
+    if (celebration) {
+        celebration.classList.remove("celebrating");
+    }
+    if (confettiLayer) {
+        confettiLayer.innerHTML = "";
+    }
+    game.classList.remove("clear-board-pop");
+}
+
+function chooseClearMessage(messageMap) {
+    const languageMessages =
+        messageMap[currentLanguage] || messageMap.ja;
+    const difficultyMessages =
+        languageMessages[boardSize] || languageMessages[3];
+    return difficultyMessages[
+        Math.floor(Math.random() * difficultyMessages.length)
+    ];
+}
+
+function createClearConfetti() {
+    const layer = document.getElementById("clear-confetti-layer");
+    if (!layer) {
+        return;
+    }
+
+    layer.innerHTML = "";
+    const amountByDifficulty = { 3: 28, 4: 38, 5: 50, 6: 64 };
+    const amount = amountByDifficulty[boardSize] || 32;
+    const shapes = ["●", "★", "◆", "🐾", "🧩"];
+    const colors = ["#ff7f91", "#ffd45c", "#6edb8a", "#67c7ff", "#b99cff", "#ffad66"];
+
+    for (let i = 0; i < amount; i++) {
+        const piece = document.createElement("span");
+        piece.className = "clear-confetti-piece";
+        piece.textContent = shapes[Math.floor(Math.random() * shapes.length)];
+        piece.style.left = (Math.random() * 100) + "%";
+        piece.style.color = colors[Math.floor(Math.random() * colors.length)];
+        piece.style.fontSize = (10 + Math.random() * 13) + "px";
+        piece.style.setProperty("--confetti-x", ((Math.random() - 0.5) * 180) + "px");
+        piece.style.setProperty("--confetti-rotate", (240 + Math.random() * 520) + "deg");
+        piece.style.animationDelay = (Math.random() * 0.24) + "s";
+        piece.style.animationDuration = (1.15 + Math.random() * 0.75) + "s";
+        layer.appendChild(piece);
+    }
+}
+
+function startClearCelebration() {
+    stopClearCelebration();
+
+    const celebration = document.getElementById("clear-celebration");
+    const stampText = document.getElementById("clear-stamp-text");
+    const mascotFace = document.getElementById("clear-mascot-face");
+    const mascotBubble = document.getElementById("clear-mascot-bubble");
+    const mascots = ["🐱", "🐶", "🐰"];
+
+    if (!celebration || !stampText || !mascotFace || !mascotBubble) {
+        return;
+    }
+
+    stampText.textContent = chooseClearMessage(clearStampMessages);
+    mascotFace.textContent = mascots[Math.floor(Math.random() * mascots.length)];
+    mascotBubble.textContent = chooseClearMessage(clearPraiseMessages);
+    celebration.dataset.difficulty = String(boardSize);
+
+    game.classList.remove("clear-board-pop");
+    void game.offsetWidth;
+    game.classList.add("clear-board-pop");
+
+    createClearConfetti();
+    void celebration.offsetWidth;
+    celebration.classList.add("celebrating");
+
+    clearCelebrationTimeout(function () {
+        const layer = document.getElementById("clear-confetti-layer");
+        if (layer) {
+            layer.innerHTML = "";
+        }
+    }, 2400);
+}
+
 function checkClear() {
 
     if (isSolved) {
@@ -2988,6 +3216,7 @@ function checkClear() {
 
         draw();
 
+        startClearCelebration();
         clearInterval(timer);
 
         stopGameBgm();
@@ -3211,19 +3440,21 @@ function startTitleGame(event) {
     });
 
     titleScreen.classList.add(
-        "title-fade-out"
+        "title-starting"
     );
 
     setTimeout(function () {
+        titleScreen.classList.add(
+            "title-fade-out"
+        );
+    }, 260);
 
+    setTimeout(function () {
         titleScreen.style.display = "none";
-
         document.getElementById(
             "game-screen"
         ).style.display = "block";
-
-    }, 1000);
-
+    }, 980);
 }
 
 

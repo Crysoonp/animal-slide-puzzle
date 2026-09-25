@@ -33,29 +33,20 @@
 
 
     <div id="title-screen">
-
-        <img src="images/title.jpg" alt="タイトル画像" id="title-image">
-
+        <div id="title-stage" aria-label="動物スライドパズルのタイトル">
+            <div id="title-art-frame">
+                <img src="images/title-v1.5.png" alt="猫、犬、うさぎの動物スライドパズル" id="title-image">
+            </div>
+            <div class="title-pop-tile title-pop-tile-left" aria-hidden="true">🐾</div>
+            <div class="title-pop-tile title-pop-tile-right" aria-hidden="true">🧩</div>
+        </div>
         <p id="title-bgm-guide">
             🔊 画面をタップするとBGMが流れます
         </p>
-
         <button class="start-button title-start-button" onclick="startTitleGame(event)">
-
             START!
-
         </button>
-
     </div>
-
-
-
-
-
-
-
-
-
 
     <div id="game-screen">
 
@@ -379,6 +370,18 @@
 
 
         <div id="clear-panel" style="display: none;">
+            <div id="clear-celebration" aria-hidden="true">
+                <div id="clear-sparkle-ring"></div>
+                <div id="clear-confetti-layer"></div>
+                <div id="clear-paw-stamp">
+                    <span id="clear-paw-icon">🐾</span>
+                    <strong id="clear-stamp-text">CLEAR!</strong>
+                </div>
+                <div id="clear-mascot">
+                    <div id="clear-mascot-face">🐱</div>
+                    <div id="clear-mascot-bubble">できたね！</div>
+                </div>
+            </div>
 
             <div id="clear-content">
 
