@@ -175,6 +175,8 @@ const translations = {
 
         soundEffects:
             "効果音",
+        haptics:
+            "振動",
 
         soundVolume:
             "効果音量",
@@ -311,6 +313,8 @@ const translations = {
 
         soundEffects:
             "Sound Effects",
+        haptics:
+            "Vibration",
 
         soundVolume:
             "Sound Volume",
@@ -384,6 +388,9 @@ let bgmEnabled =
 
 let soundEffectsEnabled =
     localStorage.getItem("soundEffectsEnabled") !== "false";
+
+let hapticsEnabled =
+    localStorage.getItem("hapticsEnabled") !== "false";
 
 let bgmVolume =
     Number(
@@ -546,7 +553,7 @@ function isNativeCapacitorApp() {
 
 
 function triggerMoveHaptic() {
-    if (!isNativeCapacitorApp()) {
+    if (!hapticsEnabled || !isNativeCapacitorApp()) {
         return;
     }
 
@@ -1132,20 +1139,20 @@ function changeLanguage(language) {
 
 
 function updateSoundButtons() {
-
     const bgmButton =
         document.getElementById(
             "bgm-toggle-button"
         );
-
     const seButton =
         document.getElementById(
             "se-toggle-button"
         );
-
+    const hapticsButton =
+        document.getElementById(
+            "haptics-toggle-button"
+        );
 
     if (bgmButton) {
-
         bgmButton.textContent =
             (
                 bgmEnabled
@@ -1159,34 +1166,40 @@ function updateSoundButtons() {
                     ? "on"
                     : "off"
             );
-
     }
 
-
     if (seButton) {
-
         seButton.textContent =
             (
                 soundEffectsEnabled
                     ? "🔊 "
                     : "🔇 "
             )
-            + getText(
-                "soundEffects"
-            )
+            + getText("soundEffects")
             + ": "
             + getText(
                 soundEffectsEnabled
                     ? "on"
                     : "off"
             );
-
     }
 
+    if (hapticsButton) {
+        hapticsButton.textContent =
+            "📳 "
+            + getText("haptics")
+            + ": "
+            + getText(
+                hapticsEnabled
+                    ? "on"
+                    : "off"
+            );
+        hapticsButton.setAttribute(
+            "aria-pressed",
+            String(hapticsEnabled)
+        );
+    }
 }
-
-
-
 
 function changeBgmVolume(value) {
     const volumeNumber = Number(value);
@@ -1238,7 +1251,11 @@ function toggleSoundEffects() {
 
 
 
-
+function toggleHaptics() {
+    hapticsEnabled = !hapticsEnabled;
+    localStorage.setItem("hapticsEnabled", hapticsEnabled);
+    updateSoundButtons();
+}
 
 function toggleSettings() {
 
