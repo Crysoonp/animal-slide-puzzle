@@ -1,13 +1,14 @@
 {
   "name": "animal-slide-puzzle",
   "version": "1.0.0",
-  "description": "かわいい動物写真を使った、スマートフォン対応のスライドパズルです。",
+  "description": "かわいい動物写真を使ったスマートフォン対応のスライドパズルです。",
   "main": "game.js",
   "directories": {
     "doc": "docs"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "add-images": "python ./add_new_puzzle_images.py"
   },
   "repository": {
     "type": "git",
