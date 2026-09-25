@@ -545,6 +545,26 @@ function isNativeCapacitorApp() {
 
 
 
+function triggerMoveHaptic() {
+    if (!isNativeCapacitorApp()) {
+        return;
+    }
+
+    const haptics =
+        window.Capacitor &&
+        window.Capacitor.Plugins &&
+        window.Capacitor.Plugins.Haptics;
+
+    if (!haptics || typeof haptics.impact !== "function") {
+        return;
+    }
+
+    haptics.impact({ style: "LIGHT" }).catch(function () {
+        // 触覚を利用できない端末でもゲームは継続する
+    });
+}
+
+
 function initializeAudioGraph() {
     if (isNativeCapacitorApp()) {
         return;
@@ -2421,6 +2441,7 @@ function moveTile(index) {
 
             moves++;
 
+            triggerMoveHaptic();
             updateMovesDisplay();
 
             isTileAnimating = false;
