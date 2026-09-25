@@ -1,37 +1,19 @@
 <!DOCTYPE html>
 <html lang="ja">
-
-
-
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="app-version" content="1.2.0">
+    <meta name="app-version" content="1.6.0">
     <title>動物スライドパズル</title>
-
     <link rel="icon" href="favicon.ico">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
     <link rel="stylesheet" href="style.css">
-
     <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;900&display=swap"
         rel="stylesheet">
-
 </head>
-
-
-
-
 <body>
-
-
-
-
-
-
-
     <div id="title-screen">
         <div id="title-stage" aria-label="動物スライドパズルのタイトル">
             <div id="title-art-frame">
@@ -47,100 +29,69 @@
             START!
         </button>
     </div>
-
     <div id="game-screen">
-
         <div class="mode-section">
-
             <div id="picture-category-title" class="mode-section-title">
-
                 遊ぶ画像
             </div>
-
             <div id="animal-mode-container">
-
                 <button id="animal-mode-all" type="button" onclick="setAnimalMode('all')">
                     <span id="animal-mode-all-text">
                         おまかせ
                     </span>
                 </button>
-
                 <button id="animal-mode-dogs" type="button" onclick="setAnimalMode('dogs')">
                     <span id="animal-mode-dogs-text">
                         わんこ
                     </span>
                 </button>
-
                 <button id="animal-mode-cats" type="button" onclick="setAnimalMode('cats')">
                     <span id="animal-mode-cats-text">
                         にゃんこ
                     </span>
                 </button>
-
                 <button id="animal-mode-otherAnimals" type="button" onclick="setAnimalMode('otherAnimals')">
                     <span id="animal-mode-other-text">
                         ほかの動物
                     </span>
                 </button>
-
             </div>
-
         </div>
-
         <div id="difficulty-container" class="difficulty-buttons">
-
             <button id="diff-3" type="button" onclick="setDifficulty(3)">
-
                 <span id="difficulty-name-3" class="difficulty-name">
                     初級
                 </span>
-
                 <span class="difficulty-size">
                     3 × 3
                 </span>
-
             </button>
-
             <button id="diff-4" type="button" onclick="setDifficulty(4)">
-
                 <span id="difficulty-name-4" class="difficulty-name">
                     中級
                 </span>
-
                 <span class="difficulty-size">
                     4 × 4
                 </span>
-
             </button>
-
             <button id="diff-5" type="button" onclick="setDifficulty(5)">
-
                 <span id="difficulty-name-5" class="difficulty-name">
                     上級
                 </span>
-
                 <span class="difficulty-size">
                     5 × 5
                 </span>
-
             </button>
-
             <button id="diff-6" type="button" onclick="setDifficulty(6)">
-
                 <span id="difficulty-name-6" class="difficulty-name">
                     超級
                 </span>
-
                 <span class="difficulty-size">
                     6 × 6
                 </span>
-
             </button>
-
         </div>
-
         <div class="main-actions">
-
             <button id="cancel-button" class="cancel-button" type="button" onclick="cancelGame()"
                 style="display: none;">
                 ⏹
@@ -148,227 +99,156 @@
                     中止
                 </span>
             </button>
-
             <button id="start-button" class="start-button" type="button" onclick="shuffle()" disabled>
                 ▶
                 <span id="start-button-text">
                     ゲーム開始
                 </span>
             </button>
-
             <button class="settings-button" type="button" onclick="toggleSettings()">
                 ⚙️
                 <span id="settings-button-text">
                     設定
                 </span>
             </button>
-
         </div>
-
-
-
-
-
         <div class="info-container">
-
             <div class="info-panel">
-
                 <div id="game-info-title" class="info-panel-title">
                     プレイ情報
                 </div>
-
                 <p id="moves">
                     🎯 移動回数: 0
                 </p>
-
                 <p id="timer">
                     ⏱ 経過時間: 00:00
                 </p>
-
             </div>
-
             <div class="record-panel">
-
                 <div id="best-records-title" class="info-panel-title">
                     ベスト記録
                 </div>
-
                 <p id="best">
                     🏅 最少移動回数: -
                 </p>
-
                 <p id="best-time">
                     ⭐ 最短時間: -
                 </p>
-
             </div>
-
         </div>
-
-
-
-
-
-
         <div id="settings-menu" style="display: none;">
-
             <div id="settings-content">
-
                 <h2>
                     ⚙️
                     <span id="settings-title-text">
                         設定
                     </span>
                 </h2>
-
-
                 <div class="language-setting">
-
                     <div id="language-setting-title" class="language-setting-title">
                         🌐 言語
                     </div>
-
                     <div class="language-buttons">
-
                         <button id="language-ja-button" type="button" onclick="changeLanguage('ja')">
                             日本語
                         </button>
-
                         <button id="language-en-button" type="button" onclick="changeLanguage('en')">
                             English
                         </button>
-
                     </div>
-
                 </div>
-
-
                 <div class="sound-setting">
-
                     <button id="bgm-toggle-button" type="button" onclick="toggleBgm()">
                         🎵 BGM：ON
                     </button>
-
                     <div class="volume-control">
-
                         <label id="bgm-volume-label" for="bgm-volume">
                             BGM音量
                         </label>
-
                         <input id="bgm-volume" type="range" min="0" max="100" step="1" value="15"
                             oninput="changeBgmVolume(this.value)">
-
                         <span id="bgm-volume-value">
                             15%
                         </span>
-
                     </div>
-
                 </div>
-
-
                 <div class="sound-setting">
-
                     <button id="se-toggle-button" type="button" onclick="toggleSoundEffects()">
                         🔊 効果音：ON
                     </button>
-
                     <div class="volume-control">
-
                         <label id="se-volume-label" for="se-volume">
                             効果音量
                         </label>
-
                         <input id="se-volume" type="range" min="0" max="100" step="1" value="70"
                             oninput="changeSoundEffectsVolume(this.value)">
-
                         <span id="se-volume-value">
                             70%
                         </span>
-
                     </div>
-
                 </div>
-
-
                 <div class="haptics-setting">
-
                     <button id="haptics-toggle-button" type="button" onclick="toggleHaptics()">
                         📳 振動：ON
                     </button>
-
                 </div>
-
                 <button id="reset-best-score-button" type="button" onclick="resetBestScore()">
                     最少移動回数をリセット
                 </button>
-
                 <button id="reset-best-time-button" type="button" onclick="resetBestTime()">
                     最短時間をリセット
                 </button>
-
                 <button id="reset-all-records-button" type="button" class="danger-button" onclick="resetAllRecords()">
                     全記録をリセット
                 </button>
-
                 <button id="settings-close-button" type="button" class="settings-close-button"
                     onclick="closeSettings()">
                     閉じる
                 </button>
-
             </div>
-
         </div>
-
-
-
-
-
         <div class="stats">
         </div>
-
         <div id="game"></div>
-
         <div class="utility-buttons">
-
             <button id="original-button" type="button" onclick="toggleOriginal()">
-
                 🖼️ 完成図
-
             </button>
-
             <button id="number-hint-button" type="button" onclick="toggleNumberHint()">
-
                 🔢 番号ヒント：OFF
-
             </button>
-
+            <button id="basic-hint-button" type="button" onclick="openBasicHint()">
+                💡 基本ヒント
+            </button>
         </div>
-
-
         <div id="original-container" style="display: none;">
-
             <div id="original-content">
-
                 <h2>
                     🖼️ <span id="original-title-text">完成図</span>
                 </h2>
-
                 <img id="original-image" alt="パズルの完成図">
-
                 <button id="original-close-button" type="button" class="original-close-button"
                     onclick="closeOriginal()">
                     閉じる
                 </button>
-
             </div>
-
         </div>
-
-
+        <div id="basic-hint-container" style="display: none;">
+            <div id="basic-hint-content">
+                <h2 id="basic-hint-title">💡 基本ヒント</h2>
+                <div id="basic-hint-step"></div>
+                <p id="basic-hint-text"></p>
+                <div id="basic-hint-actions">
+                    <button id="basic-hint-next-button" type="button" onclick="showNextBasicHint()">
+                        次のヒント
+                    </button>
+                    <button id="basic-hint-close-button" type="button" onclick="closeBasicHint()">
+                        閉じる
+                    </button>
+                </div>
+            </div>
+        </div>
         <div id="message"></div>
-
-
         <div id="clear-panel" style="display: none;">
             <div id="clear-celebration" aria-hidden="true">
                 <div id="clear-sparkle-ring"></div>
@@ -382,80 +262,45 @@
                     <div id="clear-mascot-bubble">できたね！</div>
                 </div>
             </div>
-
             <div id="clear-content">
-
                 <div id="clear-stats">
-
                     <div class="clear-stat-card">
-
                         <span id="clear-moves-label" class="clear-stat-label">
                             🎯 移動回数
                         </span>
-
                         <span id="clear-moves" class="clear-stat-value">
-
                             0回
-
                         </span>
-
                     </div>
-
                     <div class="clear-stat-card">
-
                         <span id="clear-time-label" class="clear-stat-label">
                             ⏱ クリア時間
                         </span>
-
                         <span id="clear-time" class="clear-stat-value">
-
                             00:00
-
                         </span>
-
                     </div>
-
                 </div>
-
                 <h2 id="clear-title">
-
                     <span class="clear-check">
                         ✓
                     </span>
-
                     <span class="clear-title-text">
                         CLEAR!
                     </span>
-
                 </h2>
-
                 <div id="clear-buttons">
-
                     <button id="clear-replay-button" type="button" class="clear-replay-button" onclick="playAgain()">
-
                         ↻ もう一回遊ぶ
-
                     </button>
-
                     <button type="button" class="clear-ok-button" onclick="closeClearPanel()">
-
                         OK
-
                     </button>
-
                 </div>
-
             </div>
-
         </div>
-
-
     </div>
-
     <script src="image-list.js?v=1.3"></script>
-
     <script src="game.js"></script>
-
 </body>
-
 </html>
