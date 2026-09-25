@@ -25,3 +25,5 @@ www/
 
 # Android test APK
 Animal-Slide-Puzzle-Ver.*-Android-Test.apk
+
+*.aab
