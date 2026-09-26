@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="app-version" content="1.6.0">
+    <meta name="app-version" content="1.8.0">
     <title>動物スライドパズル</title>
     <link rel="icon" href="favicon.ico">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
@@ -31,8 +31,9 @@
     </div>
     <div id="game-screen">
         <div class="mode-section">
-            <div id="picture-category-title" class="mode-section-title">
-                遊ぶ画像
+            <div id="picture-category-title" class="mode-section-title setup-step-title">
+                <span class="setup-step-number">1</span>
+                遊ぶ動物の種類を選んでね
             </div>
             <div id="animal-mode-container">
                 <button id="animal-mode-all" type="button" onclick="setAnimalMode('all')">
@@ -56,6 +57,10 @@
                     </span>
                 </button>
             </div>
+        </div>
+        <div id="difficulty-step-title" class="mode-section-title setup-step-title">
+            <span class="setup-step-number">2</span>
+            難易度を選んでね
         </div>
         <div id="difficulty-container" class="difficulty-buttons">
             <button id="diff-3" type="button" onclick="setDifficulty(3)">
@@ -90,6 +95,16 @@
                     6 × 6
                 </span>
             </button>
+        </div>
+        <button id="album-open-button" type="button" onclick="openAnimalAlbum()" aria-label="動物アルバムを開く">
+            📚 <span id="album-open-button-text">アルバム</span>
+        </button>
+        <div id="difficulty-role-description" class="difficulty-role-description" aria-live="polite">
+            難易度を選ぶと、遊び方がここに表示されます。
+        </div>
+        <div id="start-step-title" class="mode-section-title setup-step-title">
+            <span class="setup-step-number">3</span>
+            ゲームを始めよう
         </div>
         <div class="main-actions">
             <button id="cancel-button" class="cancel-button" type="button" onclick="cancelGame()"
@@ -192,6 +207,17 @@
                         📳 振動：ON
                     </button>
                 </div>
+                <div id="hint-debug-setting" class="hint-debug-setting">
+                    <button id="hint-debug-toggle-button" type="button" onclick="toggleHintDebugLogging()">
+                        ヒント解析ログ：OFF
+                    </button>
+                    <button id="hint-debug-export-button" type="button" onclick="exportHintDebugLog()">
+                        ヒントログを保存
+                    </button>
+                    <button id="hint-debug-reset-button" type="button" onclick="resetHintDebugLog()">
+                        ヒントログをリセット
+                    </button>
+                </div>
                 <button id="reset-best-score-button" type="button" onclick="resetBestScore()">
                     最少移動回数をリセット
                 </button>
@@ -199,7 +225,13 @@
                     最短時間をリセット
                 </button>
                 <button id="reset-all-records-button" type="button" class="danger-button" onclick="resetAllRecords()">
-                    全記録をリセット
+                    ベスト記録をすべてリセット
+                </button>
+                <button id="reset-album-data-button" type="button" class="danger-button" onclick="resetV18AlbumData()">
+                    アルバムデータをリセット
+                </button>
+                <button id="reset-device-data-button" type="button" class="danger-button v18-strong-danger" onclick="resetV18DeviceGameData()">
+                    この端末のゲームデータを初期化
                 </button>
                 <button id="settings-close-button" type="button" class="settings-close-button"
                     onclick="closeSettings()">
@@ -219,6 +251,9 @@
             </button>
             <button id="basic-hint-button" type="button" onclick="openBasicHint()">
                 💡 基本ヒント
+            </button>
+            <button id="one-step-hint-button" type="button" onclick="showOneStepHint()">
+                👣 1手ヒント
             </button>
         </div>
         <div id="original-container" style="display: none;">
@@ -248,6 +283,25 @@
                 </div>
             </div>
         </div>
+        <div id="one-step-hint-message" aria-live="polite"></div>
+        <div id="album-container" style="display: none;">
+            <div id="album-content">
+                <div class="album-header">
+                    <div>
+                        <h2 id="album-title">📚 動物アルバム</h2>
+                        <p id="album-summary"></p>
+                    </div>
+                    <button id="album-close-button" type="button" onclick="closeAnimalAlbum()">閉じる</button>
+                </div>
+                <div id="album-category-tabs"></div>
+                <div id="album-filter-row">
+                    <button id="album-all-filter" type="button" onclick="setAlbumFilter('all')">すべて</button>
+                    <button id="album-unlocked-filter" type="button" onclick="setAlbumFilter('unlocked')">解放済み</button>
+                    <button id="album-favorite-filter" type="button" onclick="setAlbumFilter('favorite')">お気に入り</button>
+                </div>
+                <div id="album-grid"></div>
+            </div>
+        </div>
         <div id="message"></div>
         <div id="clear-panel" style="display: none;">
             <div id="clear-celebration" aria-hidden="true">
@@ -258,7 +312,10 @@
                     <strong id="clear-stamp-text">CLEAR!</strong>
                 </div>
                 <div id="clear-mascot">
-                    <div id="clear-mascot-face">🐱</div>
+                    <div id="clear-mascot-face" aria-label="テコちゃん（仮）">
+                        <img id="teko-mascot-image" src="images/teko-chan/teko-clear.webp" alt="" hidden>
+                        <span id="teko-mascot-fallback" aria-hidden="true">🐱</span>
+                    </div>
                     <div id="clear-mascot-bubble">できたね！</div>
                 </div>
             </div>
@@ -300,7 +357,7 @@
             </div>
         </div>
     </div>
-    <script src="image-list.js?v=1.3"></script>
+    <script src="image-list.js?v=1.8"></script>
     <script src="game.js"></script>
 </body>
 </html>
