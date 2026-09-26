@@ -2925,7 +2925,19 @@ function startClearCelebration() {
         return;
     }
     stampText.textContent = chooseClearMessage(clearStampMessages);
-    mascotFace.textContent = mascots[Math.floor(Math.random() * mascots.length)];
+    /* Teko-chan emoji replacement fix */
+    const tekoImage = document.getElementById("teko-mascot-image");
+    const tekoFallback = document.getElementById("teko-mascot-fallback");
+    if (tekoImage) {
+        const tekoPoseName = boardSize >= 5 ? "teko-jump.webp" : "teko-wave.webp";
+        tekoImage.src = "images/teko-chan/" + tekoPoseName;
+        tekoImage.hidden = false;
+        if (tekoFallback) {
+            tekoFallback.hidden = true;
+        }
+    } else {
+        mascotFace.textContent = mascots[Math.floor(Math.random() * mascots.length)];
+    }
     mascotBubble.textContent = chooseClearMessage(clearPraiseMessages);
     celebration.dataset.difficulty = String(boardSize);
     game.classList.remove("clear-board-pop");
@@ -5283,3 +5295,33 @@ function v18OfferSavedSessionRestore() {
 }
 
 setTimeout(v18OfferSavedSessionRestore, 300);
+
+
+/* ========================================
+   Teko-chan official character selection
+======================================== */
+var TEKO_CHARACTER_ASSETS = {
+    wave: "images/teko-chan/teko-wave.webp",
+    jump: "images/teko-chan/teko-jump.webp",
+    sad: "images/teko-chan/teko-sad.webp",
+    confused: "images/teko-chan/teko-confused.webp"
+};
+function setTekoCharacterPose(poseName) {
+    var image = document.getElementById("teko-mascot-image");
+    var fallback = document.getElementById("teko-mascot-fallback");
+    if (!image) return;
+    var selectedPose = TEKO_CHARACTER_ASSETS[poseName] ? poseName : "wave";
+    image.src = TEKO_CHARACTER_ASSETS[selectedPose];
+    image.dataset.tekoPose = selectedPose;
+    image.hidden = false;
+    if (fallback) fallback.hidden = true;
+}
+function getTekoClearPose() {
+    return boardSize >= 5 ? "jump" : "wave";
+}
+var tekoOriginalStartClearCelebration = startClearCelebration;
+startClearCelebration = function () {
+    setTekoCharacterPose(getTekoClearPose());
+    return tekoOriginalStartClearCelebration.apply(this, arguments);
+};
+window.setTekoCharacterPose = setTekoCharacterPose;
