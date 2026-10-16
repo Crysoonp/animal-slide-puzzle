@@ -2300,6 +2300,7 @@ function completeTileMove(
                 playRowCompletionCelebration(
                     newlyCompletedRows
                 );
+                scheduleV17R9ProgressCelebrationCheck();
             }
         })
         .catch(function () {
@@ -2428,10 +2429,11 @@ let gameBgmFadeTimer = null;
 function startGameBgm() {
     initializeAudioGraph();
     clearInterval(gameBgmFadeTimer);
-    gameBgm.pause();
-    gameBgm.currentTime = 0;
-    if (!bgmEnabled || bgmVolume === 0) {
-        return;
+    gameBgmFadeTimer = null;
+    if (!gameBgm.paused) gameBgm.pause();
+    try { gameBgm.currentTime = 0; } catch (error) { }
+    if (!bgmEnabled || bgmVolume === 0 || document.visibilityState === "hidden") {
+        return Promise.resolve(false);
     }
     applyBgmVolume();
     if (audioGraphInitialized && gameBgmFadeGain) {
@@ -2440,8 +2442,11 @@ function startGameBgm() {
     } else {
         gameBgm.volume = 0;
     }
-    gameBgm.play().catch(function (error) {
-        console.log("プレイBGMを再生できませんでした:", error);
+    var playPromise = gameBgm.play().catch(function (error) {
+        if (!v1819IsExpectedAudioInterruption(error)) {
+            console.log("プレイBGMを再生できませんでした:", error);
+        }
+        return false;
     });
     gameBgmFadeTimer = setInterval(function () {
         if (audioGraphInitialized && gameBgmFadeGain) {
@@ -2468,6 +2473,7 @@ function startGameBgm() {
 }
 function stopGameBgm() {
     clearInterval(gameBgmFadeTimer);
+    gameBgmFadeTimer = null;
     gameBgm.pause();
     gameBgm.currentTime = 0;
     if (audioGraphInitialized && gameBgmFadeGain) {
@@ -3041,51 +3047,51 @@ function checkClear() {
     }
 }
 let titleBgmStartPending = false;
+let v1819TitleBgmRequestId = 0;
+function v1819IsExpectedAudioInterruption(error) {
+    return Boolean(error && (
+        error.name === "AbortError"
+        || error.name === "NotAllowedError"
+    ));
+}
+function v1819StopTitleBgm() {
+    v1819TitleBgmRequestId++;
+    titleBgmStartPending = false;
+    titleBgm.pause();
+    try { titleBgm.currentTime = 0; } catch (error) { }
+}
 function startTitleBgm() {
+    if (
+        titleScreen.classList.contains("title-fade-out")
+        || titleScreen.style.display === "none"
+        || document.visibilityState === "hidden"
+        || !bgmEnabled
+        || bgmVolume <= 0
+        || !titleBgm.paused
+        || titleBgmStartPending
+    ) {
+        return Promise.resolve(false);
+    }
     initializeAudioGraph();
-    if (
-        titleScreen.classList.contains(
-            "title-fade-out"
-        ) ||
-        titleScreen.style.display === "none"
-    ) {
-        return;
-    }
-    if (
-        !bgmEnabled ||
-        bgmVolume === 0
-    ) {
-        titleBgmGuide.classList.add(
-            "hidden"
-        );
-        return;
-    }
-    if (!titleBgm.paused) {
-        return;
-    }
-    if (titleBgmStartPending) {
-        return;
-    }
+    var requestId = ++v1819TitleBgmRequestId;
     titleBgmStartPending = true;
     titleBgm.currentTime = 0;
     titleBgm.volume = bgmVolume;
-    titleBgm.play()
+    return titleBgm.play()
         .then(function () {
-            titleBgmGuide.classList.add(
-                "hidden"
-            );
-            titleScreen.removeEventListener(
-                "click",
-                startTitleBgm
-            );
+            if (requestId !== v1819TitleBgmRequestId) return false;
+            titleBgmStartPending = false;
+            titleBgmGuide.classList.add("hidden");
+            return true;
         })
         .catch(function (error) {
-            console.error("タイトルBGM再生エラー:", error);
-            titleBgmStartPending = false;
-            /*
-             * 自動再生が拒否された場合は
-             * イベントを残し、次のタップで再試行する
-             */
+            if (requestId === v1819TitleBgmRequestId) {
+                titleBgmStartPending = false;
+            }
+            if (!v1819IsExpectedAudioInterruption(error)) {
+                console.error("タイトルBGM再生エラー:", error);
+            }
+            return false;
         });
 }
 titleScreen.addEventListener(
@@ -3099,8 +3105,7 @@ function startTitleGame(event) {
         "click",
         startTitleBgm
     );
-    titleBgm.pause();
-    titleBgm.currentTime = 0;
+    v1819StopTitleBgm();
     titleStartSound.currentTime = 0;
     playSoundEffect(titleStartSound).catch(error => {
         console.log(
@@ -3222,7 +3227,7 @@ function getAlbumCategoryImages(category) {
     return allImages;
 }
 function unlockCurrentAlbumImage() {
-    if (boardSize < 5) return;
+    if (boardSize < 4) return;
     if (!currentImage || !allImages.includes(currentImage)) return;
     const unlocked = readV17Set(V17_UNLOCKED_KEY);
     unlocked.add(currentImage);
@@ -4118,11 +4123,11 @@ function getV17DifficultyRoleText(size) {
             ? "お試し・練習モードです。操作を覚えながら、1手ヒントを自由に使えます。アルバム解放はありません。"
             : "Trial and practice mode. Learn the controls with unlimited one-step hints. Album images are not unlocked here.",
         4: ja
-            ? "標準・解き方習得モードです。上の段から揃える基本解法を練習できます。アルバム解放はありません。"
-            : "Standard learning mode. Practice the basic top-row solving method. Album images are not unlocked here.",
+            ? "標準・コレクションモードです。クリアすると、その動物画像がアルバムに解放されます。"
+            : "Standard collection mode. Clearing the puzzle unlocks that animal image in the album.",
         5: ja
-            ? "動物コレクションモードです。クリアすると動物アルバムに画像が追加されます。現在のテスト版では1手ヒントを自由に使えます。"
-            : "Animal collection mode. Clearing the puzzle unlocks its image in the album. One-step hints are unlimited during testing.",
+            ? "上級・コレクションモードです。クリアすると、その動物画像がアルバムに解放されます。"
+            : "Advanced collection mode. Clearing the puzzle unlocks that animal image in the album.",
         6: ja
             ? "高難易度のチャレンジモードです。クリアすると画像が解放されます。将来はランキングに対応予定です。"
             : "High-difficulty challenge mode. Clearing unlocks the image. Ranking support is planned for a future version."
@@ -4678,7 +4683,9 @@ function playV17R9Chime(major) {
     if (typeof playSoundEffect !== 'function') {
         return;
     }
-    const sound = major ? clearSound : rowShararanSound;
+    // The clear fanfare is reserved for a fully solved board.
+    // Row, column and main-area progress always use the lighter progress sound.
+    const sound = rowShararanSound;
     if (!sound) {
         return;
     }
@@ -4941,20 +4948,12 @@ function scheduleV17R9ProgressCelebrationCheck() {
 }
 
 function connectV17R10BoardObserver() {
-    const board = getV17R9BoardElement();
-    if (!board || board === v17R10ObservedBoard) return;
-
-    if (v17R10Observer) v17R10Observer.disconnect();
-    v17R10ObservedBoard = board;
-    v17R10Observer = new MutationObserver(function () {
-        runV17R10CheckAfterPaint();
-    });
-    v17R10Observer.observe(board, {
-        childList: true,
-        subtree: true,
-        attributes: true,
-        attributeFilter: ['class', 'style', 'data-number', 'data-tile-number']
-    });
+    /* Ver.1.8.2: run completion checks explicitly after committed moves. */
+    if (v17R10Observer) {
+        v17R10Observer.disconnect();
+        v17R10Observer = null;
+    }
+    v17R10ObservedBoard = getV17R9BoardElement();
 }
 
 const v17R10OriginalResetCelebration = resetV17R9ProgressCelebration;
@@ -4972,7 +4971,7 @@ window.setTimeout(connectV17R10BoardObserver, 200);
 /* ========================================
    Ver.1.8 closed-test foundation revision 1
 ======================================== */
-var V18_APP_VERSION = "1.8.0";
+var V18_APP_VERSION = "1.8.20";
 var V18_DEBUG_UI_VISIBLE = true;
 var V18_MAX_DEBUG_EVENTS = 3000;
 var V18_MAX_DEBUG_SESSIONS = 20;
@@ -5058,7 +5057,7 @@ v18WrapAfter("celebrateV17R9MainArea", function () {
     v18RecordSystemEvent("main_area_complete_celebration", { triggerReason: "top_rows_complete", soundName: "progress_major_chime" });
 });
 v18WrapAfter("unlockCurrentAlbumImage", function () {
-    if (boardSize >= 5 && currentImage) v18RecordSystemEvent("album_image_unlocked", { image: currentImage, collection: boardSize === 5 ? "5x5" : "general" });
+    if (boardSize >= 4 && currentImage) v18RecordSystemEvent("album_image_unlocked", { image: currentImage, collection: boardSize === 5 ? "5x5" : "general" });
 });
 
 var v18OriginalCheckClear = checkClear;
@@ -5237,8 +5236,7 @@ function v18RestoreSavedSession(snapshot) {
     snapshot.restoredAt = new Date().toISOString();
     v18SafeWriteJson(V18_SESSION_SNAPSHOT_KEY, snapshot);
 
-    titleBgm.pause();
-    titleBgm.currentTime = 0;
+    v1819StopTitleBgm();
     titleScreen.style.display = "none";
     gameScreen.style.display = "block";
     gameScreen.classList.add("game-playing");
@@ -5325,3 +5323,679 @@ startClearCelebration = function () {
     return tekoOriginalStartClearCelebration.apply(this, arguments);
 };
 window.setTekoCharacterPose = setTekoCharacterPose;
+
+/* ========================================
+   Ver.1.8.2 stability lifecycle revision 1
+======================================== */
+var V182_GAME_ACTIVE = false;
+function v182CancelProgressFrame() {
+    if (v17R10FrameId) {
+        window.cancelAnimationFrame(v17R10FrameId);
+        v17R10FrameId = 0;
+    }
+    v17R9PendingCheck = false;
+}
+function v182StopRuntimeWork(options) {
+    options = options || {};
+    clearInterval(timer); timer = null;
+    clearInterval(gameBgmFadeTimer); gameBgmFadeTimer = null;
+    clearTimeout(oneStepHintTimer); oneStepHintTimer = null;
+    v182CancelProgressFrame();
+    stopRowCompletionCelebration();
+    if (options.clearCelebration !== false) stopClearCelebration();
+    if (v17R10Observer) { v17R10Observer.disconnect(); v17R10Observer = null; }
+    V182_GAME_ACTIVE = false;
+}
+function v182StartRuntimeWork() {
+    clearInterval(timer);
+    timer = setInterval(updateTimer, 1000);
+    V182_GAME_ACTIVE = true;
+    resetV17R9ProgressCelebration();
+}
+function v182UpdateResumeMessage() {
+    if (!message) return;
+    message.textContent = currentLanguage === "ja"
+        ? "前回の続きから再開しました"
+        : "Previous game restored";
+    message.classList.add("v182-resume-message");
+}
+var v182OriginalShuffle = shuffle;
+shuffle = function () {
+    v182StopRuntimeWork();
+    var result = v182OriginalShuffle.apply(this, arguments);
+    v182StartRuntimeWork();
+    return result;
+};
+var v182OriginalRestore = v18RestoreSavedSession;
+v18RestoreSavedSession = function (snapshot) {
+    v182StopRuntimeWork();
+    var result = v182OriginalRestore.apply(this, arguments);
+    v182StartRuntimeWork();
+    v182UpdateResumeMessage();
+    return result;
+};
+var v182OriginalCancel = cancelGame;
+cancelGame = function () { v182StopRuntimeWork(); return v182OriginalCancel.apply(this, arguments); };
+var v182OriginalCloseClear = closeClearPanel;
+closeClearPanel = function () { v182StopRuntimeWork(); return v182OriginalCloseClear.apply(this, arguments); };
+var v182OriginalCheckClear = checkClear;
+checkClear = function () {
+    var wasSolved = isSolved;
+    var result = v182OriginalCheckClear.apply(this, arguments);
+    if (!wasSolved && isSolved) {
+        v182StopRuntimeWork({ clearCelebration: false });
+        localStorage.setItem("v182LastCompletedImage", currentImage || "");
+    }
+    return result;
+};
+document.addEventListener("visibilitychange", function () {
+    if (document.visibilityState === "hidden") {
+        clearInterval(timer); timer = null; v182CancelProgressFrame();
+    } else if (gameStarted && !isSolved && V182_GAME_ACTIVE && timer === null) {
+        timer = setInterval(updateTimer, 1000);
+    }
+});
+window.addEventListener("pagehide", function () { v182StopRuntimeWork(); });
+
+/* ========================================
+   Ver.1.8.3 Android back navigation
+======================================== */
+window.handleAnimalBack = function () {
+    var album = document.getElementById("album-container");
+    if (clearPanel && clearPanel.classList.contains("show")) {
+        closeClearPanel();
+        return "handled";
+    }
+    if (album && (album.style.display === "flex" || album.style.display === "block")) {
+        closeAnimalAlbum();
+        return "handled";
+    }
+    if (settingsMenu && settingsMenu.style.display !== "none" && settingsMenu.style.display !== "") {
+        closeSettings();
+        return "handled";
+    }
+    if (gameScreen && gameScreen.style.display !== "none" && gameStarted) {
+        var text = currentLanguage === "ja"
+            ? "ゲームを中断してタイトルへ戻りますか？進行状況は保存されます。"
+            : "Pause this game and return to the title? Progress will be saved.";
+        if (window.confirm(text)) {
+            if (typeof v18SaveActiveSession === "function") v18SaveActiveSession("android_back");
+            cancelGame();
+        }
+        return "handled";
+    }
+    return "exit";
+};
+
+/* Ver.1.8.6: Ver.1.8.5 completed-preview rollback.
+   Keeps Ver.1.8.2-1.8.4 stability, back navigation, visibility and scroll fixes. */
+
+/* ========================================
+   Ver.1.8.7 resumed game BGM recovery
+======================================== */
+var v187OriginalRestoreSavedSession = v18RestoreSavedSession;
+var v1813ResumeBgmPending = false;
+v18RestoreSavedSession = function (snapshot) {
+    var result = v187OriginalRestoreSavedSession.apply(this, arguments);
+    v1813ResumeBgmPending = Boolean(gameStarted && !isSolved && bgmEnabled && bgmVolume > 0);
+    return result;
+};
+var v1813AudioRecoveryRunning = false;
+async function v187RecoverBgmAfterUserGesture() {
+    if (!bgmEnabled || bgmVolume <= 0 || v1813AudioRecoveryRunning) return;
+    v1813AudioRecoveryRunning = true;
+    try {
+        initializeAudioGraph();
+        if (audioContext && audioContext.state === "suspended") {
+            await audioContext.resume();
+        }
+        if (gameStarted && !isSolved && gameScreen && gameScreen.style.display !== "none") {
+            if (gameBgm.paused || v1813ResumeBgmPending) {
+                v1813ResumeBgmPending = false;
+                startGameBgm();
+            }
+            return;
+        }
+        if (!gameStarted && titleScreen && titleScreen.style.display !== "none" && titleBgm.paused) {
+            startTitleBgm();
+        }
+    } catch (error) {
+        /* The next user gesture retries audio recovery. */
+    } finally {
+        v1813AudioRecoveryRunning = false;
+    }
+}
+document.addEventListener("keydown", v187RecoverBgmAfterUserGesture);
+
+/* ========================================
+   Ver.1.8.8 version display and production settings
+======================================== */
+function v188CreateVersionLabel(className) {
+    var label = document.createElement("div");
+    label.className = "app-version-label " + className;
+    label.textContent = "Ver." + V18_APP_VERSION;
+    label.setAttribute("aria-label", "Application version " + V18_APP_VERSION);
+    return label;
+}
+function v188InstallVersionLabels() {
+    var titleStage = document.getElementById("title-stage");
+    if (titleStage && !titleStage.querySelector(".title-version-label")) {
+        titleStage.appendChild(v188CreateVersionLabel("title-version-label"));
+    }
+    var gameScreenNode = document.getElementById("game-screen");
+    if (gameScreenNode && !gameScreenNode.querySelector(".game-version-label")) {
+        gameScreenNode.appendChild(v188CreateVersionLabel("game-version-label"));
+    }
+}
+function v188ApplyProductionSettings() {
+    var debugSetting = document.getElementById("hint-debug-setting");
+    if (debugSetting) {
+        debugSetting.hidden = true;
+        debugSetting.setAttribute("aria-hidden", "true");
+    }
+}
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", function () {
+        v188InstallVersionLabels();
+        v188ApplyProductionSettings();
+    });
+} else {
+    v188InstallVersionLabels();
+    v188ApplyProductionSettings();
+}
+
+/* Ver.1.8.9 Android missing assets: TEKO GAMES logo and Teko-chan clear image packaged. */
+
+/* Ver.1.8.10 Android asset packaging finalized. */
+
+/* Ver.1.8.11 Teko result assets packaged: clear, wave, jump, sad, confused. */
+
+/* ========================================
+   Ver.1.8.12 zero-move resume and album guidance
+======================================== */
+var v1812OriginalSaveSessionSnapshot = v18SaveSessionSnapshot;
+v18SaveSessionSnapshot = function () {
+    if (!gameStarted || isSolved || moves <= 0) {
+        if (moves <= 0) localStorage.removeItem(V18_SESSION_SNAPSHOT_KEY);
+        return;
+    }
+    return v1812OriginalSaveSessionSnapshot.apply(this, arguments);
+};
+var v1812OriginalOfferSavedSessionRestore = v18OfferSavedSessionRestore;
+v18OfferSavedSessionRestore = function () {
+    var snapshot = v18SafeReadJson(V18_SESSION_SNAPSHOT_KEY, null);
+    if (snapshot && (Number(snapshot.moves) || 0) <= 0) {
+        localStorage.removeItem(V18_SESSION_SNAPSHOT_KEY);
+        return;
+    }
+    return v1812OriginalOfferSavedSessionRestore.apply(this, arguments);
+};
+function v1812InstallAlbumUnlockGuide() {
+    var summary = document.getElementById("album-summary");
+    if (!summary || document.getElementById("album-unlock-guide")) return;
+    var guide = document.createElement("p");
+    guide.id = "album-unlock-guide";
+    guide.setAttribute("aria-live", "polite");
+    summary.insertAdjacentElement("afterend", guide);
+    v1812UpdateAlbumUnlockGuide();
+}
+function v1812UpdateAlbumUnlockGuide() {
+    var guide = document.getElementById("album-unlock-guide");
+    if (!guide) return;
+    guide.textContent = currentLanguage === "ja"
+        ? "🔓 4×4・5×5をクリアすると、その動物画像が解放されます。"
+        : "🔓 Clear a 4×4 or 5×5 puzzle to unlock that animal image.";
+}
+var v1812OriginalOpenAnimalAlbum = openAnimalAlbum;
+openAnimalAlbum = function () {
+    v1812InstallAlbumUnlockGuide();
+    v1812UpdateAlbumUnlockGuide();
+    return v1812OriginalOpenAnimalAlbum.apply(this, arguments);
+};
+var v1812OriginalApplyLanguage = applyLanguage;
+applyLanguage = function () {
+    var result = v1812OriginalApplyLanguage.apply(this, arguments);
+    v1812InstallAlbumUnlockGuide();
+    v1812UpdateAlbumUnlockGuide();
+    return result;
+};
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", v1812InstallAlbumUnlockGuide);
+} else {
+    v1812InstallAlbumUnlockGuide();
+}
+
+/* ========================================
+   Ver.1.8.13 resumed audio and fading notice
+======================================== */
+var v1813ResumeNoticeTimer = null;
+var v1813ResumeNoticeRemoveTimer = null;
+function v1813ScheduleResumeNoticeFade() {
+    if (!message || !message.classList.contains("v182-resume-message")) return;
+    clearTimeout(v1813ResumeNoticeTimer);
+    clearTimeout(v1813ResumeNoticeRemoveTimer);
+    message.classList.remove("resume-notice-fading");
+    message.hidden = false;
+    v1813ResumeNoticeTimer = window.setTimeout(function () {
+        message.classList.add("resume-notice-fading");
+        v1813ResumeNoticeRemoveTimer = window.setTimeout(function () {
+            message.hidden = true;
+            message.textContent = "";
+            message.classList.remove("v182-resume-message", "v181-resume-message", "resume-notice-fading");
+        }, 1400);
+    }, 5000);
+}
+var v1813OriginalRestoreSavedSession = v18RestoreSavedSession;
+v18RestoreSavedSession = function (snapshot) {
+    var result = v1813OriginalRestoreSavedSession.apply(this, arguments);
+    v1813ScheduleResumeNoticeFade();
+    return result;
+};
+document.addEventListener("pointerdown", v187RecoverBgmAfterUserGesture, { capture: true, passive: true });
+
+/* ========================================
+   Ver.1.8.15 automatic preview launch animation
+======================================== */
+var v1815PreviewImage = null;
+var v1815PreviewRunning = false;
+var v1815PreviousBodyOverflow = "";
+function v1815InstallPreview() {
+    if (document.getElementById("v1815-preview-container")) return;
+    var container = document.createElement("div");
+    container.id = "v1815-preview-container";
+    container.hidden = true;
+    container.setAttribute("aria-live", "polite");
+    container.innerHTML = [
+        '<div id="v1815-preview-card">',
+        '<h2 id="v1815-preview-title"></h2>',
+        '<div id="v1815-preview-difficulty"></div>',
+        '<img id="v1815-preview-image" alt="">',
+        '</div>'
+    ].join("");
+    document.body.appendChild(container);
+    v1815UpdateLanguage();
+}
+function v1815UpdateLanguage() {
+    var title = document.getElementById("v1815-preview-title");
+    var difficulty = document.getElementById("v1815-preview-difficulty");
+    var image = document.getElementById("v1815-preview-image");
+    if (title) title.textContent = currentLanguage === "ja" ? "今回の完成図" : "Completed Image";
+    if (difficulty) difficulty.textContent = getDifficultyName() + "  " + boardSize + " × " + boardSize;
+    if (image) image.alt = currentLanguage === "ja" ? "今回のパズルの完成図" : "Completed image for this puzzle";
+}
+function v1815GetSuctionTransform(imageElement) {
+    var button = document.getElementById("original-button");
+    if (!button || !imageElement) return { x: 0, y: window.innerHeight * 0.42 };
+    var imageRect = imageElement.getBoundingClientRect();
+    var buttonRect = button.getBoundingClientRect();
+    return {
+        x: (buttonRect.left + buttonRect.width / 2) - (imageRect.left + imageRect.width / 2),
+        y: (buttonRect.top + buttonRect.height / 2) - (imageRect.top + imageRect.height / 2)
+    };
+}
+function v1815FinishPreviewAndStart() {
+    var container = document.getElementById("v1815-preview-container");
+    if (container) {
+        container.hidden = true;
+        container.style.display = "none";
+        container.classList.remove("show", "sucking");
+    }
+    document.body.style.overflow = v1815PreviousBodyOverflow;
+    var selectedImage = v1815PreviewImage;
+    v1815PreviewImage = null;
+    v1815PreviewRunning = false;
+    if (!selectedImage) return;
+    v17ReplayImage = selectedImage;
+    shuffle();
+}
+function v1814OpenStartPreview() {
+    if (selectedAnimalMode === null || selectedDifficulty === null || gameStarted || v1815PreviewRunning) return;
+    v1815InstallPreview();
+    v1815PreviewRunning = true;
+    playSoundEffect(buttonSound).catch(function () {});
+    randomImage();
+    if (!currentImage) { v1815PreviewRunning = false; return; }
+    v1815PreviewImage = currentImage;
+    var container = document.getElementById("v1815-preview-container");
+    var image = document.getElementById("v1815-preview-image");
+    image.src = "images/" + v1815PreviewImage;
+    image.style.setProperty("--suction-x", "0px");
+    image.style.setProperty("--suction-y", "0px");
+    v1815UpdateLanguage();
+    v1815PreviousBodyOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    container.hidden = false;
+    container.style.display = "flex";
+    window.requestAnimationFrame(function () { container.classList.add("show"); });
+    window.setTimeout(function () {
+        if (!v1815PreviewRunning) return;
+        var target = v1815GetSuctionTransform(image);
+        image.style.setProperty("--suction-x", target.x + "px");
+        image.style.setProperty("--suction-y", target.y + "px");
+        container.classList.add("sucking");
+    }, 2000);
+    window.setTimeout(v1815FinishPreviewAndStart, 2920);
+}
+var v1815OriginalApplyLanguage = applyLanguage;
+applyLanguage = function () {
+    var result = v1815OriginalApplyLanguage.apply(this, arguments);
+    v1815UpdateLanguage();
+    return result;
+};
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", v1815InstallPreview);
+} else {
+    v1815InstallPreview();
+}
+
+/* ========================================
+   Ver.1.8.16 public difficulties and 4x4 album unlock
+======================================== */
+function v1816ApplyPublicDifficultyPolicy() {
+    var sixButton = document.getElementById("diff-6");
+    if (sixButton) {
+        sixButton.hidden = true;
+        sixButton.setAttribute("aria-hidden", "true");
+        sixButton.tabIndex = -1;
+    }
+    if (!gameStarted && selectedDifficulty === 6) {
+        selectedDifficulty = null;
+        boardSize = 3;
+        updateDifficultyButtons();
+        updateV17DifficultyRoleDescription();
+        updateStartButtonState();
+        createBoard();
+        draw();
+    }
+}
+var v1816OriginalReplayAlbumImage = replayAlbumImage;
+replayAlbumImage = function (image) {
+    if (selectedDifficulty === 6) {
+        selectedDifficulty = 5;
+        boardSize = 5;
+    }
+    return v1816OriginalReplayAlbumImage.apply(this, arguments);
+};
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", v1816ApplyPublicDifficultyPolicy);
+} else {
+    v1816ApplyPublicDifficultyPolicy();
+}
+
+/* ========================================
+   Ver.1.8.17 clear fanfare isolation
+======================================== */
+var v1817OriginalPlaySoundEffect = playSoundEffect;
+playSoundEffect = function (audio, options) {
+    if (audio === clearSound && !isSolved) {
+        if (typeof v18RecordSystemEvent === "function") {
+            v18RecordSystemEvent("blocked_premature_clear_fanfare", {
+                boardSize: boardSize,
+                moves: moves,
+                reason: "board_not_solved"
+            });
+        }
+        return Promise.resolve(false);
+    }
+    return v1817OriginalPlaySoundEffect.call(this, audio, options);
+};
+
+/* ========================================
+   Ver.1.8.18 album cleanup and replay difficulty picker
+======================================== */
+var v1818ReplayImage = null;
+function v1818GetAlbumProgressText() {
+    var images = getAlbumCategoryImages(albumCategory);
+    var unlocked = readV17Set(V17_UNLOCKED_KEY);
+    var count = images.filter(function (image) { return unlocked.has(image); }).length;
+    var remaining = Math.max(0, images.length - count);
+    if (currentLanguage === "ja") {
+        return "解放 " + count + " / " + images.length + "  ・  あと" + remaining + "種類";
+    }
+    return "Unlocked " + count + " / " + images.length + "  ·  " + remaining + " remaining";
+}
+function v1818InstallAlbumStructure() {
+    var tabs = document.getElementById("album-category-tabs");
+    var filters = document.getElementById("album-filter-row");
+    if (tabs && !document.getElementById("v1818-album-category-label")) {
+        var categoryLabel = document.createElement("div");
+        categoryLabel.id = "v1818-album-category-label";
+        categoryLabel.className = "v1818-album-section-label";
+        tabs.insertAdjacentElement("beforebegin", categoryLabel);
+    }
+    if (filters && !document.getElementById("v1818-album-filter-label")) {
+        var filterLabel = document.createElement("div");
+        filterLabel.id = "v1818-album-filter-label";
+        filterLabel.className = "v1818-album-section-label";
+        filters.insertAdjacentElement("beforebegin", filterLabel);
+    }
+    v1818UpdateAlbumLabels();
+}
+function v1818UpdateAlbumLabels() {
+    var categoryLabel = document.getElementById("v1818-album-category-label");
+    var filterLabel = document.getElementById("v1818-album-filter-label");
+    if (categoryLabel) categoryLabel.textContent = currentLanguage === "ja" ? "動物の種類" : "Animal Category";
+    if (filterLabel) filterLabel.textContent = currentLanguage === "ja" ? "表示する画像" : "Images to Show";
+}
+var v1818OriginalRenderAnimalAlbum = renderAnimalAlbum;
+renderAnimalAlbum = function () {
+    v1818InstallAlbumStructure();
+    var result = v1818OriginalRenderAnimalAlbum.apply(this, arguments);
+    var summary = document.getElementById("album-summary");
+    if (summary) summary.textContent = v1818GetAlbumProgressText();
+    v1818UpdateAlbumLabels();
+    return result;
+};
+function v1818InstallReplayPicker() {
+    if (document.getElementById("v1818-replay-picker")) return;
+    var picker = document.createElement("div");
+    picker.id = "v1818-replay-picker";
+    picker.hidden = true;
+    picker.setAttribute("role", "dialog");
+    picker.setAttribute("aria-modal", "true");
+    picker.innerHTML = [
+        '<div id="v1818-replay-picker-content">',
+        '<h2 id="v1818-replay-picker-title"></h2>',
+        '<img id="v1818-replay-picker-image" alt="">',
+        '<p id="v1818-replay-picker-prompt"></p>',
+        '<div id="v1818-replay-difficulties">',
+        '<button type="button" data-size="3"><strong></strong><span>3 × 3</span></button>',
+        '<button type="button" data-size="4"><strong></strong><span>4 × 4</span></button>',
+        '<button type="button" data-size="5"><strong></strong><span>5 × 5</span></button>',
+        '</div>',
+        '<button id="v1818-replay-cancel" type="button"></button>',
+        '</div>'
+    ].join("");
+    document.body.appendChild(picker);
+    picker.querySelectorAll("[data-size]").forEach(function (button) {
+        button.addEventListener("click", function () {
+            v1818StartAlbumReplay(Number(button.dataset.size));
+        });
+    });
+    document.getElementById("v1818-replay-cancel").addEventListener("click", v1818CloseReplayPicker);
+    picker.addEventListener("click", function (event) {
+        if (event.target === picker) v1818CloseReplayPicker();
+    });
+    v1818UpdateReplayPickerLanguage();
+}
+function v1818UpdateReplayPickerLanguage() {
+    var title=document.getElementById("v1818-replay-picker-title");
+    var prompt=document.getElementById("v1818-replay-picker-prompt");
+    var cancel=document.getElementById("v1818-replay-cancel");
+    var image=document.getElementById("v1818-replay-picker-image");
+    if(title) title.textContent=currentLanguage === "ja" ? "この画像で遊ぶ" : "Play with This Image";
+    if(prompt) prompt.textContent=currentLanguage === "ja" ? "難易度を選んでください" : "Choose a difficulty";
+    if(cancel) cancel.textContent=currentLanguage === "ja" ? "キャンセル" : "Cancel";
+    if(image) image.alt=currentLanguage === "ja" ? "選択した動物画像" : "Selected animal image";
+    var names=currentLanguage === "ja" ? {3:"初級",4:"中級",5:"上級"} : {3:"Easy",4:"Normal",5:"Hard"};
+    document.querySelectorAll("#v1818-replay-difficulties [data-size]").forEach(function(button){
+        var strong=button.querySelector("strong");
+        if(strong) strong.textContent=names[Number(button.dataset.size)];
+    });
+}
+replayAlbumImage = function (image) {
+    if (!readV17Set(V17_UNLOCKED_KEY).has(image)) return;
+    v1818InstallReplayPicker();
+    v1818ReplayImage = image;
+    var preview = document.getElementById("v1818-replay-picker-image");
+    if (preview) preview.src = "images/" + image;
+    var picker = document.getElementById("v1818-replay-picker");
+    picker.hidden = false;
+    picker.style.display = "flex";
+    document.body.style.overflow = "hidden";
+    playSoundEffect(buttonSound).catch(function () {});
+};
+function v1818CloseReplayPicker() {
+    var picker=document.getElementById("v1818-replay-picker");
+    if(picker){ picker.hidden=true; picker.style.display="none"; }
+    v1818ReplayImage=null;
+    var album=document.getElementById("album-container");
+    document.body.style.overflow = album && album.style.display === "flex" ? "hidden" : "";
+}
+function v1818StartAlbumReplay(size) {
+    if (![3,4,5].includes(size) || !v1818ReplayImage) return;
+    var image=v1818ReplayImage;
+    v1818ReplayImage=null;
+    var picker=document.getElementById("v1818-replay-picker");
+    if(picker){ picker.hidden=true; picker.style.display="none"; }
+    selectedDifficulty=size;
+    boardSize=size;
+    selectedAnimalMode=getImageCategory(image);
+    isSolved=false;
+    gameStarted=false;
+    createBoard();
+    updateMovesDisplay();
+    updateTimerDisplay();
+    updateBestDisplay();
+    document.querySelectorAll("#difficulty-container button").forEach(function(button){
+        button.classList.toggle("selected-difficulty", button.id === "diff-" + size);
+    });
+    document.querySelectorAll("#animal-mode-container button").forEach(function(button){
+        button.classList.toggle("selected-animal-mode", button.id === "animal-mode-" + selectedAnimalMode);
+    });
+    updateV17DifficultyRoleDescription();
+    updateStartButtonState();
+    draw();
+    closeAnimalAlbum();
+    v17ReplayImage=image;
+    v1814OpenStartPreview();
+}
+var v1818OriginalApplyLanguage=applyLanguage;
+applyLanguage=function(){
+    var result=v1818OriginalApplyLanguage.apply(this,arguments);
+    v1818UpdateAlbumLabels();
+    v1818UpdateReplayPickerLanguage();
+    return result;
+};
+var v1818OriginalHandleAnimalBack=window.handleAnimalBack;
+window.handleAnimalBack=function(){
+    var picker=document.getElementById("v1818-replay-picker");
+    if(picker && !picker.hidden && picker.style.display !== "none"){
+        v1818CloseReplayPicker();
+        return "handled";
+    }
+    return v1818OriginalHandleAnimalBack.apply(this,arguments);
+};
+if(document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded",function(){v1818InstallAlbumStructure();v1818InstallReplayPicker();});
+}else{
+    v1818InstallAlbumStructure();v1818InstallReplayPicker();
+}
+
+/* ========================================
+   Ver.1.8.19 unified BGM lifecycle
+======================================== */
+document.addEventListener("visibilitychange", function () {
+    if (document.visibilityState === "hidden") {
+        clearInterval(gameBgmFadeTimer);
+        gameBgmFadeTimer = null;
+        if (!titleBgm.paused) titleBgm.pause();
+        if (!gameBgm.paused) gameBgm.pause();
+        return;
+    }
+    /* BGM resumes only after the next real user gesture. */
+    if (gameStarted && !isSolved && bgmEnabled && bgmVolume > 0) {
+        v1813ResumeBgmPending = true;
+    }
+});
+
+/* ========================================
+   Ver.1.8.20 unified Android back navigation
+======================================== */
+function v1820IsVisible(element) {
+    if (!element || element.hidden) return false;
+    var style = window.getComputedStyle(element);
+    return style.display !== "none" && style.visibility !== "hidden";
+}
+function v1820ReturnToTitle() {
+    clearInterval(timer);
+    timer = null;
+    clearInterval(gameBgmFadeTimer);
+    gameBgmFadeTimer = null;
+    stopGameBgm();
+    gameScreen.classList.remove("game-playing");
+    gameScreen.style.display = "none";
+    titleScreen.classList.remove("title-starting", "title-fade-out");
+    titleScreen.style.display = "flex";
+    titleScreen.style.opacity = "1";
+    document.body.style.overflow = "";
+    titleBgmGuide.classList.toggle("hidden", !bgmEnabled || bgmVolume <= 0);
+}
+function v1820ConfirmExit() {
+    var text = currentLanguage === "ja"
+        ? "動物スライドパズルを終了しますか？"
+        : "Exit Animal Slide Puzzle?";
+    return window.confirm(text);
+}
+window.handleAnimalBack = function () {
+    var replayPicker = document.getElementById("v1818-replay-picker");
+    var preview = document.getElementById("v1815-preview-container");
+    var album = document.getElementById("album-container");
+
+    if (v1820IsVisible(replayPicker)) {
+        v1818CloseReplayPicker();
+        return "handled";
+    }
+    if (v1820IsVisible(originalContainer)) {
+        closeOriginal();
+        return "handled";
+    }
+    if (v1820IsVisible(basicHintContainer)) {
+        closeBasicHint();
+        return "handled";
+    }
+    if (v1820IsVisible(settingsMenu)) {
+        closeSettings();
+        return "handled";
+    }
+    if (v1820IsVisible(album)) {
+        closeAnimalAlbum();
+        return "handled";
+    }
+    if (clearPanel && (clearPanel.classList.contains("show") || v1820IsVisible(clearPanel))) {
+        closeClearPanel();
+        return "handled";
+    }
+    if (preview && v1815PreviewRunning && v1820IsVisible(preview)) {
+        /* The automatic preview is a short start animation and is not cancelled. */
+        return "handled";
+    }
+    if (gameStarted && !isSolved && v1820IsVisible(gameScreen)) {
+        var pauseText = currentLanguage === "ja"
+            ? "ゲームを中断して選択画面へ戻りますか？進行状況は保存されます。"
+            : "Pause this game and return to the selection screen? Progress will be saved.";
+        if (window.confirm(pauseText)) {
+            v18SaveSessionSnapshot();
+            cancelGame();
+        }
+        return "handled";
+    }
+    if (v1820IsVisible(gameScreen)) {
+        v1820ReturnToTitle();
+        return "handled";
+    }
+    if (v1820IsVisible(titleScreen)) {
+        return v1820ConfirmExit() ? "exit" : "handled";
+    }
+    return "handled";
+};

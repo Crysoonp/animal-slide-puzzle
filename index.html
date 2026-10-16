@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="app-version" content="1.8.0">
+    <meta name="app-version" content="1.8.20">
     <title>動物スライドパズル</title>
     <link rel="icon" href="favicon.ico">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="512x512" href="icon-teko-games.png">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=1.8.20">
     <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;900&display=swap"
         rel="stylesheet">
 </head>
@@ -92,14 +92,6 @@
                     5 × 5
                 </span>
             </button>
-            <button id="diff-6" type="button" onclick="setDifficulty(6)">
-                <span id="difficulty-name-6" class="difficulty-name">
-                    超級
-                </span>
-                <span class="difficulty-size">
-                    6 × 6
-                </span>
-            </button>
         </div>
         <button id="album-open-button" type="button" onclick="openAnimalAlbum()" aria-label="動物アルバムを開く">
             📚 <span id="album-open-button-text">アルバム</span>
@@ -119,7 +111,7 @@
                     中止
                 </span>
             </button>
-            <button id="start-button" class="start-button" type="button" onclick="shuffle()" disabled>
+            <button id="start-button" class="start-button" type="button" onclick="v1814OpenStartPreview()" disabled>
                 ▶
                 <span id="start-button-text">
                     ゲーム開始
@@ -362,7 +354,7 @@
             </div>
         </div>
     </div>
-    <script src="image-list.js?v=1.8"></script>
-    <script src="game.js"></script>
+    <script src="image-list.js?v=1.8.3"></script>
+    <script src="game.js?v=1.8.20"></script>
 </body>
 </html>
